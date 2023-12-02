@@ -5,6 +5,10 @@ using Auctria_Application.Extensions;
 var builder = WebApplication.CreateBuilder(args);
 
 // -------------------------- Register Services --------------------------
+builder.Services.AddDatabaseService(builder.Configuration, useSqlLite: true);
+builder.Services.AddAuthenticationService();
+builder.Services.AddIdentityService(builder.Configuration);
+builder.Services.AddOtherServices();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
