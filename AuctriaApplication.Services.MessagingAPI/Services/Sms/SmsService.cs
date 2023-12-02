@@ -15,7 +15,7 @@ public class SmsService : ISmsService
         TwilioClient.Init(_config.AccountSid, _config.AuthToken);
     }
 
-    public async Task<(bool, string)> SendAsync(
+    public async Task<bool> SendAsync(
         string userPhone, 
         string body)
     {
@@ -29,9 +29,8 @@ public class SmsService : ISmsService
             messageResource.Status == MessageResource.StatusEnum.Queued ||
             messageResource.Status == MessageResource.StatusEnum.Sending ||
             messageResource.Status == MessageResource.StatusEnum.Accepted)
-            return (true, "Message sent successfully");
-
-        return (false, "Failed to send message!");
+            return true;
+        return false;
     }
 
     private CreateMessageOptions CreateMessageOptions(string userPhone, string body)

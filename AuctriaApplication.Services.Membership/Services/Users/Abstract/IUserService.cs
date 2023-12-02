@@ -5,7 +5,7 @@ namespace AuctriaApplication.Services.Membership.Services.Users.Abstract;
 
 public interface IUserService
 {
-    Task<List<UserViewModel>> GetUsersListAsync();
+    Task<List<UserViewModel>> GetListAsync();
     
     Task<UserDto> CurrentUserAsync(Guid userId);
 
@@ -34,5 +34,9 @@ public interface IUserService
     Task<bool> IsUserLockedAsync(
         Guid? userId = null,
         string? email = null);
+
+    Task<bool> IsFieldVerifiedAsync(
+        Guid userId,
+        string fieldName);
 
 }

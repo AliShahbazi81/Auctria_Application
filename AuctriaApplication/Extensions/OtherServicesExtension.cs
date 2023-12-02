@@ -1,14 +1,12 @@
-﻿using AuctriaApplication.DataAccess.Entities.Stores;
-using AuctriaApplication.Infrastructure.Services;
+﻿using AuctriaApplication.Infrastructure.Services;
 using AuctriaApplication.Infrastructure.Store.Services;
 using AuctriaApplication.Infrastructure.Store.Services.Abstract;
 using AuctriaApplication.Services.Membership.Services.Token;
 using AuctriaApplication.Services.Membership.Services.Users;
+using AuctriaApplication.Services.Membership.Services.Users.Abstract;
 using AuctriaApplication.Services.MessagingAPI.Services.Email;
 using AuctriaApplication.Services.MessagingAPI.Services.Sms;
 using AuctriaApplication.Services.Store.Services.Abstract;
-using AuctriaApplication.Services.Validation.Services.Phone;
-using Microsoft.AspNetCore.Identity;
 
 namespace Auctria_Application.Extensions;
 
@@ -19,7 +17,7 @@ public static class OtherServicesExtension
         // ----------------------- Services -----------------------
         // Membership
         services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<UserService>();
+        services.AddScoped<IUserService, UserService>();
 
         // Messaging
         // Email

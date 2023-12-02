@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using AuctriaApplication.DataAccess.DbContext;
-using AuctriaApplication.DataAccess.Entities;
 using AuctriaApplication.DataAccess.Entities.Users;
 using AuctriaApplication.Services.Membership.Dto;
 using AuctriaApplication.Services.Membership.Dto.ViewModel;
@@ -24,7 +23,7 @@ public class UserService : IUserService
         _tokenService = tokenService;
     }
     
-    public async Task<List<UserViewModel>> GetUsersListAsync()
+    public async Task<List<UserViewModel>> GetListAsync()
     {
         await using var dbContext = await _context.CreateDbContextAsync();
 
@@ -222,6 +221,19 @@ public class UserService : IUserService
             .SingleAsync();
 
         return user.LockoutEnabled && user.LockoutEnd >= DateTime.UtcNow;
+    }
+    
+    public async Task<bool> IsFieldVerifiedAsync(
+        Guid userId, 
+        string fieldName)
+    {
+        await using var dbContext = await _context.CreateDbContextAsync();
+
+        var user = await dbContext.User.FindAsync(userId);
+
+        var propertyInfo = typeof(User).GetProperty(fieldName);
+
+        return (bool) propertyInfo?.GetValue(user)!;
     }
     
     private static async Task<string?> UserRoleAsync(
