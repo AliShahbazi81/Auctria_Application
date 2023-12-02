@@ -1,0 +1,75 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctriaApplication", "AuctriaApplication\AuctriaApplication.csproj", "{4F333682-3A7B-449B-9FCB-885825685EDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctriaApplication.Services.Membership", "AuctriaApplication.Services.Membership\AuctriaApplication.Services.Membership.csproj", "{C3D81DE3-5AE1-4EF9-B831-1A36B7BC523C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{F0506B47-80FE-4232-B5BE-358632F331FE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{CBC873BD-2067-4496-8FCB-9E2A6D82BACF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{40CA0103-3650-4EB7-989F-927C64A0F079}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{0A97CD88-43FE-4B22-9F53-8F414DEDD819}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctriaApplication.DataAccess", "AuctriaApplication.DataAccess\AuctriaApplication.DataAccess.csproj", "{AB64D67E-6679-4D1A-9EAB-032BAFEBE21F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctriaApplication.Domain", "AuctriaApplication.Domain\AuctriaApplication.Domain.csproj", "{49FC0595-B288-481A-ACED-DF034AAF1D93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctriaApplication.Services.MessagingAPI", "AuctriaApplication.Services.MessagingAPI\AuctriaApplication.Services.MessagingAPI.csproj", "{D262F873-F89E-4A83-A105-81572DACFF3B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctriaApplication.Services.Validation", "AuctriaApplication.Services.Validation\AuctriaApplication.Services.Validation.csproj", "{15A82DE3-53D6-48AC-8C39-2CAF8F8E9D4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctriaApplication.Infrastructure", "AuctriaApplication.Infrastructure\AuctriaApplication.Infrastructure.csproj", "{9CDEB050-6A80-4130-851A-E07BFC17C904}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctriaApplication.Services.Store", "AuctriaApplication.Services.Store\AuctriaApplication.Services.Store.csproj", "{8641CBE8-671C-4305-9E5D-49B065EEFAE1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F333682-3A7B-449B-9FCB-885825685EDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F333682-3A7B-449B-9FCB-885825685EDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F333682-3A7B-449B-9FCB-885825685EDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F333682-3A7B-449B-9FCB-885825685EDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3D81DE3-5AE1-4EF9-B831-1A36B7BC523C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3D81DE3-5AE1-4EF9-B831-1A36B7BC523C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3D81DE3-5AE1-4EF9-B831-1A36B7BC523C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3D81DE3-5AE1-4EF9-B831-1A36B7BC523C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB64D67E-6679-4D1A-9EAB-032BAFEBE21F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB64D67E-6679-4D1A-9EAB-032BAFEBE21F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB64D67E-6679-4D1A-9EAB-032BAFEBE21F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB64D67E-6679-4D1A-9EAB-032BAFEBE21F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49FC0595-B288-481A-ACED-DF034AAF1D93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49FC0595-B288-481A-ACED-DF034AAF1D93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49FC0595-B288-481A-ACED-DF034AAF1D93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49FC0595-B288-481A-ACED-DF034AAF1D93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D262F873-F89E-4A83-A105-81572DACFF3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D262F873-F89E-4A83-A105-81572DACFF3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D262F873-F89E-4A83-A105-81572DACFF3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D262F873-F89E-4A83-A105-81572DACFF3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15A82DE3-53D6-48AC-8C39-2CAF8F8E9D4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15A82DE3-53D6-48AC-8C39-2CAF8F8E9D4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15A82DE3-53D6-48AC-8C39-2CAF8F8E9D4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15A82DE3-53D6-48AC-8C39-2CAF8F8E9D4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CDEB050-6A80-4130-851A-E07BFC17C904}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CDEB050-6A80-4130-851A-E07BFC17C904}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CDEB050-6A80-4130-851A-E07BFC17C904}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CDEB050-6A80-4130-851A-E07BFC17C904}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8641CBE8-671C-4305-9E5D-49B065EEFAE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8641CBE8-671C-4305-9E5D-49B065EEFAE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8641CBE8-671C-4305-9E5D-49B065EEFAE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8641CBE8-671C-4305-9E5D-49B065EEFAE1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{AB64D67E-6679-4D1A-9EAB-032BAFEBE21F} = {40CA0103-3650-4EB7-989F-927C64A0F079}
+		{49FC0595-B288-481A-ACED-DF034AAF1D93} = {40CA0103-3650-4EB7-989F-927C64A0F079}
+		{C3D81DE3-5AE1-4EF9-B831-1A36B7BC523C} = {F0506B47-80FE-4232-B5BE-358632F331FE}
+		{D262F873-F89E-4A83-A105-81572DACFF3B} = {F0506B47-80FE-4232-B5BE-358632F331FE}
+		{15A82DE3-53D6-48AC-8C39-2CAF8F8E9D4F} = {F0506B47-80FE-4232-B5BE-358632F331FE}
+		{9CDEB050-6A80-4130-851A-E07BFC17C904} = {CBC873BD-2067-4496-8FCB-9E2A6D82BACF}
+		{8641CBE8-671C-4305-9E5D-49B065EEFAE1} = {F0506B47-80FE-4232-B5BE-358632F331FE}
+	EndGlobalSection
+EndGlobal
