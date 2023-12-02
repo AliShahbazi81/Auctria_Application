@@ -1,4 +1,5 @@
 ﻿using AuctriaApplication.DataAccess.Entities.Users;
+using AuctriaApplication.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -7,6 +8,7 @@ namespace AuctriaApplication.DataAccess.Entities.Stores;
 public class Cart : EntityBase
 {
     public required decimal Total { get; set; }
+    public required PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
     
     // Relationships
     public virtual ICollection<ProductCart> ProductCarts { get; set; } = null!;
