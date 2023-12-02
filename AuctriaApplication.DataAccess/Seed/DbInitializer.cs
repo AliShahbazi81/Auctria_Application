@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using AuctriaApplication.DataAccess.DbContext;
-using AuctriaApplication.DataAccess.Entities;
 using AuctriaApplication.DataAccess.Entities.Users;
 using AuctriaApplication.Domain.Enums;
 using AuctriaApplication.Domain.Variables;
@@ -65,6 +64,8 @@ public static class DbInitializer
         {
             SharedRolesVar.Admin => new List<PermissionAction>
             {
+                PermissionAction.Members_List,
+                PermissionAction.Members_Lockout,
             },
             _ => new List<PermissionAction>()
         };
@@ -82,18 +83,6 @@ public static class DbInitializer
                 Name = "Admin",
                 UserName = "Admin",
                 Email = "admin@test.com"
-            },
-            new User
-            {
-                Name = "AgentManager",
-                UserName = "AgentManager",
-                Email = "AgentManager@test.com"
-            },
-            new User
-            {
-                Name = "Agent",
-                UserName = "Agent",
-                Email = "agent@test.com"
             },
             new User
             {
