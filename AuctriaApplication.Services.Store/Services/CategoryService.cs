@@ -1,5 +1,8 @@
-﻿using AuctriaApplication.DataAccess.DbContext;
+﻿using System.Linq.Expressions;
+using System.Net.Security;
+using AuctriaApplication.DataAccess.DbContext;
 using AuctriaApplication.DataAccess.Entities.Stores;
+using AuctriaApplication.Domain.Helper;
 using AuctriaApplication.Services.Store.Dto;
 using AuctriaApplication.Services.Store.Dto.ViewModel;
 using AuctriaApplication.Services.Store.Exceptions;
@@ -131,6 +134,25 @@ public class CategoryService : ICategoryService
             throw new NotSavedException(false);
         
         return true;
+    }
+
+    public async Task<bool> IsCategoryAsync(
+        Guid? categoryId = null, 
+        string? categoryName = null)
+    {
+        await using var dbContext = await _context.CreateDbContextAsync();
+
+        categoryName = StringHelper.ConvertToLowerCaseNoSpaces(categoryName);
+
+        Expression<Func<Category, bool>> predicate = category =>
+            (categoryId.HasValue && category.Id == categoryId.Value) ||
+            (!string.IsNullOrWhiteSpace(categoryName) && category.Name.ToLower().Replace(" ", "") == categoryName);
+
+        var categoryExists = await dbContext.Categories
+            .AsNoTracking()
+            .AnyAsync(predicate);
+
+        return categoryExists;
     }
 
     private static CategoryViewModel ToViewModel(Category category)

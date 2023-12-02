@@ -63,4 +63,8 @@ public interface ICategoryService
     Task<bool> DeleteAsync(
         Guid categoryId,
         CancellationToken cancellationToken);
+
+    Task<bool> IsCategoryAsync(
+        Guid? categoryId = null, 
+        string? categoryName = null);
 }
