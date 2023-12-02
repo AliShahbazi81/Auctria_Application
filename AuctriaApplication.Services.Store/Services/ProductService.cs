@@ -1,4 +1,5 @@
-﻿using AuctriaApplication.DataAccess.DbContext;
+﻿using System.Linq.Expressions;
+using AuctriaApplication.DataAccess.DbContext;
 using AuctriaApplication.DataAccess.Entities.Stores;
 using AuctriaApplication.Domain.Helper;
 using AuctriaApplication.Services.Store.Dto;
@@ -45,29 +46,23 @@ public class ProductService : IProductService
 
     public async Task<IEnumerable<ProductViewModel>> GetListAsync(
         CancellationToken cancellationToken,
-        string? productName = null,
-        string? categoryName = null,
-        double minPrice = 0,
-        double maxPrice = 0,
-        int pageNumber = 1,
-        int pageSize = 20, 
-        bool isDeleted = false)
+        ProductFilterDto filterDto)
     {
         await using var dbContext = await _context.CreateDbContextAsync(cancellationToken);
 
-        productName = StringHelper.ConvertToLowerCaseNoSpaces(productName);
-        categoryName = StringHelper.ConvertToLowerCaseNoSpaces(categoryName);
+        filterDto.ProductName = StringHelper.ConvertToLowerCaseNoSpaces(filterDto.ProductName);
+        filterDto.CategoryName = StringHelper.ConvertToLowerCaseNoSpaces(filterDto.CategoryName);
 
         var products = await dbContext.Products
             .AsNoTracking()
             .Include(x => x.Category)
-            .Where(x => productName == null || EF.Functions.Like(x.Name.ToLower().Replace(" ", ""), productName) &&
-                        categoryName == null || EF.Functions.Like(x.Category.Name.ToLower().Replace(" ", ""), categoryName) &&
-                        x.Price >= (decimal)minPrice &&
-                        x.Price <= (decimal)maxPrice &&
-                        x.IsDeleted == isDeleted)
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
+            .Where(x => filterDto.ProductName == null || EF.Functions.Like(x.Name.ToLower().Replace(" ", ""), filterDto.ProductName) &&
+                        filterDto.CategoryName == null || EF.Functions.Like(x.Category.Name.ToLower().Replace(" ", ""), filterDto.CategoryName) &&
+                        x.Price >= (decimal)filterDto.MinPrice &&
+                        x.Price <= (decimal)filterDto.MaxPrice &&
+                        x.IsDeleted == filterDto.IsDeleted)
+            .Skip((filterDto.PageNumber - 1) * filterDto.PageSize)
+            .Take(filterDto.PageSize)
             .ToListAsync(cancellationToken: cancellationToken);
 
         return products.Select(ToViewModel);
@@ -144,6 +139,25 @@ public class ProductService : IProductService
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return product.IsDeleted;
+    }
+
+    public async Task<bool> IsProductAsync(
+        Guid? productId = null, 
+        string? productName = null)
+    {
+        await using var dbContext = await _context.CreateDbContextAsync();
+
+        productName = StringHelper.ConvertToLowerCaseNoSpaces(productName)!;
+        
+        Expression<Func<Product, bool>> predicate = product =>
+            (productId.HasValue && product.Id == productId.Value) ||
+            (!string.IsNullOrWhiteSpace(productName) && product.Name.ToLower().Replace(" ", "") == productName);
+
+        var isProduct = await dbContext.Products
+            .AsNoTracking()
+            .AnyAsync(predicate);
+        
+        return isProduct;
     }
 
     private static ProductViewModel ToViewModel(Product product)
