@@ -44,6 +44,20 @@ public class ProductService : IProductService
         return ToViewModel(product);
     }
 
+    public async Task<Product> GetProductByIdAsync(Guid productId)
+    {
+        await using var dbContext = await _context.CreateDbContextAsync();
+
+        var product = await dbContext.Products
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.Id == productId);
+
+        if (product is null)
+            throw new NotFoundException();
+
+        return product;
+    }
+
     public async Task<IEnumerable<ProductViewModel>> GetListAsync(
         CancellationToken cancellationToken,
         ProductFilterDto filterDto)

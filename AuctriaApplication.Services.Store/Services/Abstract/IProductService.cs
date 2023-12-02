@@ -1,4 +1,5 @@
-﻿using AuctriaApplication.Services.Store.Dto;
+﻿using AuctriaApplication.DataAccess.Entities.Stores;
+using AuctriaApplication.Services.Store.Dto;
 using AuctriaApplication.Services.Store.Dto.ViewModel;
 
 namespace AuctriaApplication.Services.Store.Services.Abstract;
@@ -19,6 +20,8 @@ public interface IProductService
         CancellationToken cancellationToken,
         Guid? productId = null,
         string? productName = null);
+
+    Task<Product> GetProductByIdAsync(Guid productId);
 
     /// <summary>
     /// Retrieves a list of products, optionally filtered by various criteria.
