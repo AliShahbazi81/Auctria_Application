@@ -1,9 +1,9 @@
 ﻿using AuctriaApplication.Domain.Enums;
 using AuctriaApplication.Domain.Helper;
-using AuctriaApplication.Domain.Results;
 using AuctriaApplication.Domain.Variables;
 using AuctriaApplication.Infrastructure.Membership.Guards;
 using AuctriaApplication.Infrastructure.Membership.Services.Abstract;
+using AuctriaApplication.Infrastructure.Results;
 using AuctriaApplication.Infrastructure.Services;
 using AuctriaApplication.Services.Membership.Dto;
 using AuctriaApplication.Services.Membership.Dto.ViewModel;

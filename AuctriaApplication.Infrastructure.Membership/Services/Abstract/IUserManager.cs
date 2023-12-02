@@ -1,4 +1,4 @@
-﻿using AuctriaApplication.Domain.Results;
+﻿using AuctriaApplication.Infrastructure.Results;
 using AuctriaApplication.Services.Membership.Dto;
 using AuctriaApplication.Services.Membership.Dto.ViewModel;
 

@@ -1,4 +1,4 @@
-﻿using AuctriaApplication.Domain.Results;
+﻿using AuctriaApplication.Infrastructure.Results;
 using AuctriaApplication.Infrastructure.Services;
 using AuctriaApplication.Infrastructure.Store.Guards;
 using AuctriaApplication.Infrastructure.Store.Services.Abstract;

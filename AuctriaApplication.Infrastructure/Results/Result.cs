@@ -1,4 +1,4 @@
-﻿namespace AuctriaApplication.Domain.Results;
+﻿namespace AuctriaApplication.Infrastructure.Results;
 
 public class Result<T>
 {
