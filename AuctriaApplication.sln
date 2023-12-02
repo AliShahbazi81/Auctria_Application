@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctriaApplication.Infrastr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctriaApplication.Services.Store", "AuctriaApplication.Services.Store\AuctriaApplication.Services.Store.csproj", "{8641CBE8-671C-4305-9E5D-49B065EEFAE1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctriaApplication.Infrastructure.Store", "AuctriaApplication.Infrastructure.Store\AuctriaApplication.Infrastructure.Store.csproj", "{FDE3125D-EA35-42D9-B8EB-671EE6916D5F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +64,10 @@ Global
 		{8641CBE8-671C-4305-9E5D-49B065EEFAE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8641CBE8-671C-4305-9E5D-49B065EEFAE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8641CBE8-671C-4305-9E5D-49B065EEFAE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDE3125D-EA35-42D9-B8EB-671EE6916D5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDE3125D-EA35-42D9-B8EB-671EE6916D5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDE3125D-EA35-42D9-B8EB-671EE6916D5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDE3125D-EA35-42D9-B8EB-671EE6916D5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AB64D67E-6679-4D1A-9EAB-032BAFEBE21F} = {40CA0103-3650-4EB7-989F-927C64A0F079}
@@ -71,5 +77,6 @@ Global
 		{15A82DE3-53D6-48AC-8C39-2CAF8F8E9D4F} = {F0506B47-80FE-4232-B5BE-358632F331FE}
 		{9CDEB050-6A80-4130-851A-E07BFC17C904} = {CBC873BD-2067-4496-8FCB-9E2A6D82BACF}
 		{8641CBE8-671C-4305-9E5D-49B065EEFAE1} = {F0506B47-80FE-4232-B5BE-358632F331FE}
+		{FDE3125D-EA35-42D9-B8EB-671EE6916D5F} = {CBC873BD-2067-4496-8FCB-9E2A6D82BACF}
 	EndGlobalSection
 EndGlobal

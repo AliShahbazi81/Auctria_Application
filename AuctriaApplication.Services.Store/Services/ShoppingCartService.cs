@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AuctriaApplication.Services.Store.Services;
 
-public class CartService : ICartService
+public class ShoppingCartService : IShoppingCartService
 {
     private readonly IDbContextFactory<ApplicationDbContext> _context;
 
-    public CartService(IDbContextFactory<ApplicationDbContext> context)
+    public ShoppingCartService(IDbContextFactory<ApplicationDbContext> context)
     {
         _context = context;
     }
