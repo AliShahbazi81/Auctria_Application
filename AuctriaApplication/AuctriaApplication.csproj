@@ -17,13 +17,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers\v1\PaymentControllers\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\AuctriaApplication.DataAccess\AuctriaApplication.DataAccess.csproj" />
       <ProjectReference Include="..\AuctriaApplication.Domain\AuctriaApplication.Domain.csproj" />
       <ProjectReference Include="..\AuctriaApplication.Infrastructure.Membership\AuctriaApplication.Infrastructure.Membership.csproj" />
+      <ProjectReference Include="..\AuctriaApplication.Infrastructure.Payment\AuctriaApplication.Infrastructure.Payment.csproj" />
       <ProjectReference Include="..\AuctriaApplication.Infrastructure.Store\AuctriaApplication.Infrastructure.Store.csproj" />
       <ProjectReference Include="..\AuctriaApplication.Services.Membership\AuctriaApplication.Services.Membership.csproj" />
       <ProjectReference Include="..\AuctriaApplication.Services.MessagingAPI\AuctriaApplication.Services.MessagingAPI.csproj" />
