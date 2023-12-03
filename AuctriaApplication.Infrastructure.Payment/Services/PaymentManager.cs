@@ -80,15 +80,12 @@ public class PaymentManager : IPaymentManager
             EmailTemplate.SuccessfulPayment(_userAccessor.GetUserUsername()),
             "Order is now being processed");
 
-        if (lowQuantityProducts == null || !lowQuantityProducts.Any())
-            return Result<string>.Success("Thanks for your payment!");
-
         // Inform SuperAdmins if the items bought by the user has quantity of 10 or less
-        if (!lowQuantityProducts.Any())
+        if (lowQuantityProducts != null && !lowQuantityProducts.Any())
             return Result<string>.Success("Thanks for your payment!");
 
         var superAdminEmails = await _userService.GetSuperAdminEmailsAsync();
-        var emailBody = CreateLowQuantityAlertEmail(lowQuantityProducts);
+        var emailBody = CreateLowQuantityAlertEmail(lowQuantityProducts!);
 
         foreach (var email in superAdminEmails)
         {
