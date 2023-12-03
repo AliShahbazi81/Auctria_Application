@@ -5,6 +5,7 @@ using AuctriaApplication.Infrastructure.Membership.Guards;
 using AuctriaApplication.Infrastructure.Membership.Services.Abstract;
 using AuctriaApplication.Infrastructure.Results;
 using AuctriaApplication.Infrastructure.Services;
+using AuctriaApplication.Infrastructure.Services.Abstract;
 using AuctriaApplication.Services.Membership.Dto;
 using AuctriaApplication.Services.Membership.Dto.ViewModel;
 using AuctriaApplication.Services.Membership.Services.Users.Abstract;
@@ -13,7 +14,7 @@ using AuctriaApplication.Services.MessagingAPI.Services.Sms;
 using AuctriaApplication.Services.MessagingAPI.Templates.Email;
 using AuctriaApplication.Services.MessagingAPI.Templates.Sms;
 using AuctriaApplication.Services.Validation.Services.Phone;
-using UserViewModel = AuctriaApplication.Services.Membership.Dto.UserViewModel;
+using UserViewModel = AuctriaApplication.Services.Membership.Dto.ViewModel.UserViewModel;
 
 namespace AuctriaApplication.Infrastructure.Membership.Services;
 

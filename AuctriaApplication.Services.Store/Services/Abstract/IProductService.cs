@@ -69,6 +69,12 @@ public interface IProductService
         Guid productId,
         CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Check if product is available
+    /// </summary>
+    /// <param name="productId">The unique identifier for the product.</param>
+    /// <param name="productName">The name of the product. Optional</param>
+    /// <returns>True if the product exists, false otherwise.</returns>
     Task<bool> IsProductAsync(
         Guid? productId = null, 
         string? productName = null);

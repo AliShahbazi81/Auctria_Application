@@ -2,6 +2,7 @@
 using AuctriaApplication.Infrastructure.Payment.Services.Abstract;
 using AuctriaApplication.Infrastructure.Results;
 using AuctriaApplication.Infrastructure.Services;
+using AuctriaApplication.Infrastructure.Services.Abstract;
 using AuctriaApplication.Services.Membership.Services.Users.Abstract;
 using AuctriaApplication.Services.MessagingAPI.Services.Email;
 using AuctriaApplication.Services.MessagingAPI.Templates.Email;

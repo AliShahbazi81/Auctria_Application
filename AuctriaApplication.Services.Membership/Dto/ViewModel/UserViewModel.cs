@@ -1,4 +1,4 @@
-﻿namespace AuctriaApplication.Services.Membership.Dto;
+﻿namespace AuctriaApplication.Services.Membership.Dto.ViewModel;
 
 public class UserViewModel
 {

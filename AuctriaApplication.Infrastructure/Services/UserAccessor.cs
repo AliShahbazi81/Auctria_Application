@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using AuctriaApplication.Infrastructure.Services.Abstract;
 using Microsoft.AspNetCore.Http;
 
 namespace AuctriaApplication.Infrastructure.Services;

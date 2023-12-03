@@ -64,6 +64,12 @@ public interface ICategoryService
         Guid categoryId,
         CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Check if category is available
+    /// </summary>
+    /// <param name="categoryId">The unique identifier for the product. Optional</param>
+    /// <param name="categoryName">The name of the category. Optional</param>
+    /// <returns>True if the category exists, false otherwise.</returns>
     Task<bool> IsCategoryAsync(
         Guid? categoryId = null, 
         string? categoryName = null);

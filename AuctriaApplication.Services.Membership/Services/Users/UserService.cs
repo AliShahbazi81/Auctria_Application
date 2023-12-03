@@ -9,7 +9,7 @@ using AuctriaApplication.Services.Membership.Services.Token;
 using AuctriaApplication.Services.Membership.Services.Users.Abstract;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using UserViewModel = AuctriaApplication.Services.Membership.Dto.UserViewModel;
+using UserViewModel = AuctriaApplication.Services.Membership.Dto.ViewModel.UserViewModel;
 
 namespace AuctriaApplication.Services.Membership.Services.Users;
 

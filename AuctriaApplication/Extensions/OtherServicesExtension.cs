@@ -1,4 +1,5 @@
 ﻿using AuctriaApplication.Infrastructure.Services;
+using AuctriaApplication.Infrastructure.Services.Abstract;
 using AuctriaApplication.Infrastructure.Store.Services;
 using AuctriaApplication.Infrastructure.Store.Services.Abstract;
 using AuctriaApplication.Services.Membership.Services.Token;

@@ -1,5 +1,6 @@
 ﻿using AuctriaApplication.Infrastructure.Results;
 using AuctriaApplication.Infrastructure.Services;
+using AuctriaApplication.Infrastructure.Services.Abstract;
 using AuctriaApplication.Infrastructure.Store.Services.Abstract;
 using AuctriaApplication.Services.Membership.Services.Users.Abstract;
 using AuctriaApplication.Services.Store.Dto.ViewModel;
