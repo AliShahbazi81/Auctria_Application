@@ -12,7 +12,7 @@ public enum PermissionAction
     Product_Update,
     
     [Description("Delete a product")]
-    Porduct_Delete,
+    Product_Delete,
     
     #endregion
 
