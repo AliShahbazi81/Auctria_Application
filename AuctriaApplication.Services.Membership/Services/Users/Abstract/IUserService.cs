@@ -1,16 +1,18 @@
 ﻿using AuctriaApplication.Services.Membership.Dto;
 using AuctriaApplication.Services.Membership.Dto.ViewModel;
+using UserViewModel = AuctriaApplication.Services.Membership.Dto.UserViewModel;
 
 namespace AuctriaApplication.Services.Membership.Services.Users.Abstract;
 
 public interface IUserService
 {
-    Task<List<UserViewModel>> GetListAsync();
+    Task<List<Dto.ViewModel.UsersViewModel>> GetListAsync();
 
-    Task<UserDto?> RegisterOrLoginAsync(RegisterOrLoginDto registerOrLoginDto);
+    Task<UserViewModel> RegisterAsync(RegisterDto registerDto);
+
+    Task<UserViewModel?> LoginAsync(LoginDto loginDto);
     
-    
-    Task<UserDto> CurrentUserAsync(Guid userId);
+    Task<UserViewModel> CurrentUserAsync(Guid userId);
 
     Task<bool> SetTempCodeAsync(
         Guid userId,

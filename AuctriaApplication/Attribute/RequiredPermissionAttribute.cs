@@ -3,7 +3,7 @@
 namespace Auctria_Application.Attribute;
 
 [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
-public class RequiredPermissionAttribute
+public class RequiredPermissionAttribute : System.Attribute
 {
     public PermissionAction Permission { get; }
 

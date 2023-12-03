@@ -1,29 +1,25 @@
 ﻿using AuctriaApplication.Infrastructure.Results;
 using AuctriaApplication.Services.Membership.Dto;
 using AuctriaApplication.Services.Membership.Dto.ViewModel;
+using UserViewModel = AuctriaApplication.Services.Membership.Dto.UserViewModel;
 
 namespace AuctriaApplication.Infrastructure.Membership.Services.Abstract;
 
 public interface IUserManager
 {
-    Task<Result<List<UserViewModel>>> GetUsersListAsync();
+    Task<Result<List<UsersViewModel>>> GetUsersListAsync();
 
-    Task<Result<UserDto>> GetCurrentUserAsync();
+    Task<Result<UserViewModel>> GetCurrentUserAsync();
 
-    Task<Result<UserDto>> RegisterOrLoginAsync(RegisterOrLoginDto userDto);
+    Task<Result<UserViewModel>> Register(RegisterDto userDto);
 
-    Task<Result<string>> SendEmailVerificationAsync(
-        Guid userId,
-        string userEmail,
-        string userFirstName,
-        CancellationToken cancellationToken = default);
+    Task<Result<UserViewModel>> LoginAsync(LoginDto loginDto);
+
+    Task<Result<string>> SendEmailVerificationAsync();
 
     Task<Result<string>> VerifyEmailAsync(string code);
 
-    Task<Result<string>> SendSmsVerificationAsync(
-        Guid userId,
-        string userPhone,
-        CancellationToken cancellationToken = default);
+    Task<Result<string>> SendSmsVerificationAsync(string userPhone);
 
     Task<Result<string>> VerifyPhoneAsync(string userCode);
 }

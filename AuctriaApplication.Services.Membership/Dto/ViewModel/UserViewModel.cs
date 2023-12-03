@@ -1,12 +1,12 @@
-﻿namespace AuctriaApplication.Services.Membership.Dto.ViewModel;
+﻿namespace AuctriaApplication.Services.Membership.Dto;
 
-public record struct UserViewModel
+public class UserViewModel
 {
-    public Guid Id { get; set; }
-    public string Username { get; set; }
-    public string Name { get; set; }
-    public string Surname { get; set; }
-    public string? Role { get; set; }
-    public string? TelegramId { get; set; }
-    public string? WhatsappId { get; set; }
+    public string? Username { get; set; }
+    public string Token { get; set; }
+    public string Role { get; set; }
+    public bool IsPhoneVerified { get; set; }
+    public bool IsEmailVerified { get; set; }
+    public bool IsLock { get; set; }
+    public bool IsTwoFactorEnabled { get; set; }
 }

@@ -4,12 +4,12 @@ using AuctriaApplication.DataAccess.Entities.Users;
 using AuctriaApplication.Domain.Helper;
 using AuctriaApplication.Domain.Variables;
 using AuctriaApplication.Services.Membership.Dto;
-using AuctriaApplication.Services.Membership.Dto.ViewModel;
 using AuctriaApplication.Services.Membership.Exceptions;
 using AuctriaApplication.Services.Membership.Services.Token;
 using AuctriaApplication.Services.Membership.Services.Users.Abstract;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using UserViewModel = AuctriaApplication.Services.Membership.Dto.UserViewModel;
 
 namespace AuctriaApplication.Services.Membership.Services.Users;
 
@@ -29,7 +29,7 @@ public class UserService : IUserService
         _userManager = userManager;
     }
     
-    public async Task<List<UserViewModel>> GetListAsync()
+    public async Task<List<Dto.ViewModel.UsersViewModel>> GetListAsync()
     {
         await using var dbContext = await _context.CreateDbContextAsync();
 
@@ -45,7 +45,7 @@ public class UserService : IUserService
         
 
         var userList = await query
-            .Select(u => new UserViewModel
+            .Select(u => new Dto.ViewModel.UsersViewModel
             {
                 Id = u.user.Id,
                 Username = u.user.UserName!,
@@ -58,63 +58,71 @@ public class UserService : IUserService
         return userList;
     }
     
-    public async Task<UserDto?> RegisterOrLoginAsync(RegisterOrLoginDto registerOrLoginDto)
+    public async Task<UserViewModel> RegisterAsync(RegisterDto registerDto)
     {
         await using var dbContext = await _context.CreateDbContextAsync();
 
-        registerOrLoginDto.Email = StringHelper.ConvertToLowerCaseNoSpaces(registerOrLoginDto.Email)!;
+        registerDto.Email = StringHelper.ConvertToLowerCaseNoSpaces(registerDto.Email)!;
 
         // Check if the user already exists
-        var user = await dbContext.User
-            .SingleOrDefaultAsync(u => u.Email!
-                .ToLower()
-                .Replace(" ", "") == registerOrLoginDto.Email);
+        var existingUser = await dbContext.User
+            .SingleOrDefaultAsync(u => u.Email!.ToLower().Replace(" ","") == registerDto.Email);
 
-        if (user != null)
+        if (existingUser != null)
         {
-            // Check if user is lockout, return null
-            if(user.LockoutEnabled && user.LockoutEnd > DateTime.Now)
-                throw new Exception("Your account is locked and it will be unlocked at " + user.LockoutEnd);
-            
-                // For regular login, check the password
-                var passwordCheck = await _userManager.CheckPasswordAsync(user, registerOrLoginDto.Password);
-                if (!passwordCheck)
-                    return null; // Password mismatch
-
-            // Create UserDto for existing user
-            return await ToUserDto(user, dbContext);
+            // User already exists
+            throw new Exception("User already exists with the provided email.");
         }
 
         // Register new user
         var newUser = new User
         {
-            Name = registerOrLoginDto.Name,
-            Surname = registerOrLoginDto.Surname,
-            Email = registerOrLoginDto.Email,
-            UserName = registerOrLoginDto.Username,
-            PhoneNumber = registerOrLoginDto.PhoneNumber,
+            Name = registerDto.Name,
+            Surname = registerDto.Surname,
+            Email = registerDto.Email,
+            UserName = registerDto.Username,
+            PhoneNumber = registerDto.PhoneNumber,
             LockoutEnabled = false,
             TwoFactorEnabled = false
         };
 
-        // Set password for regular user
-        var createResult = await _userManager.CreateAsync(newUser, registerOrLoginDto.Password);
+        var createResult = await _userManager.CreateAsync(newUser, registerDto.Password);
 
         if (!createResult.Succeeded)
-            return null; // User creation failed
+            throw new Exception("User creation failed.");
 
         // Assign role "Member"
         await _userManager.AddToRoleAsync(newUser, SharedRolesVar.Member);
 
         await dbContext.SaveChangesAsync();
 
-        // Create UserDto for new user
         return await ToUserDto(newUser, dbContext);
     }
-
-    private async Task<UserDto> ToUserDto(User user, ApplicationDbContext dbContext)
+    
+    public async Task<UserViewModel?> LoginAsync(LoginDto loginDto)
     {
-        return new UserDto
+        await using var dbContext = await _context.CreateDbContextAsync();
+
+        loginDto.Email = StringHelper.ConvertToLowerCaseNoSpaces(loginDto.Email)!;
+
+        var user = await dbContext.User
+            .SingleOrDefaultAsync(u => u.Email == loginDto.Email);
+
+        if (user == null)
+            return null;
+
+        var passwordCheck = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+        if (!passwordCheck)
+            return null; // Password mismatch
+
+        return await ToUserDto(user, dbContext);
+    }
+
+
+
+    private async Task<UserViewModel> ToUserDto(User user, ApplicationDbContext dbContext)
+    {
+        return new UserViewModel
         {
             Username = user.UserName,
             Token = await _tokenService.GenerateAsync(user),
@@ -126,7 +134,7 @@ public class UserService : IUserService
         };
     }
 
-    public async Task<UserDto> CurrentUserAsync(Guid userId)
+    public async Task<UserViewModel> CurrentUserAsync(Guid userId)
     {
         await using var dbContext = await _context.CreateDbContextAsync();
 
@@ -134,7 +142,7 @@ public class UserService : IUserService
             .Where(x => x.Id == userId)
             .SingleOrDefaultAsync();
 
-        return new UserDto
+        return new UserViewModel
         {
             Username = user!.UserName,
             Token = await _tokenService.GenerateAsync(user),

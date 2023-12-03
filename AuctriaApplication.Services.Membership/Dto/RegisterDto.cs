@@ -1,6 +1,6 @@
 ﻿namespace AuctriaApplication.Services.Membership.Dto;
 
-public record struct RegisterOrLoginDto
+public record struct RegisterDto
 {
     public string Name { get; set; }
     public string Surname { get; set; }
