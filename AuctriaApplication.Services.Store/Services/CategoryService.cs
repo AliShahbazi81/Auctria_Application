@@ -76,7 +76,7 @@ public class CategoryService : ICategoryService
             Description = categoryDto.Description,
             CreatedAt = DateTime.UtcNow,
 
-            AddedBy = creatorId
+            UserId = creatorId
         }).Entity;
 
         var isSaved = await dbContext.SaveChangesAsync(cancellationToken) > 0;

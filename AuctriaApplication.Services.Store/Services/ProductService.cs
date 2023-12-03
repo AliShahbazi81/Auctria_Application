@@ -98,7 +98,7 @@ public class ProductService : IProductService
             Quantity = productDto.Quantity,
             Price = (decimal)productDto.Price,
             CategoryId = categoryId,
-            AddedBy = creatorId
+            UserId = creatorId
         }).Entity;
 
         var isSaved = await dbContext.SaveChangesAsync(cancellationToken) > 0;

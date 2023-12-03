@@ -10,7 +10,7 @@ public class Category : EntityBase
     public string? Description { get; set; }
     
     // Relationships
-    public required Guid AddedBy { get; set; }
+    public required Guid UserId { get; set; }
     public virtual User User{ get; set; }
     public virtual ICollection<Product> Products { get; set; } = null!;
 }
@@ -24,7 +24,7 @@ public class CategoryBuilder : IEntityTypeConfiguration<Category>
 
         builder.HasOne(x => x.User)
             .WithMany(x => x.Categories)
-            .HasForeignKey(x => x.AddedBy)
+            .HasForeignKey(x => x.UserId)
             .IsRequired()
             .OnDelete(DeleteBehavior.NoAction);
     }

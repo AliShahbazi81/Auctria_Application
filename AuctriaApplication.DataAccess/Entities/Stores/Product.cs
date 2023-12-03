@@ -14,7 +14,7 @@ public class Product : EntityBase
     public bool IsDeleted { get; set; }
     
     // Relationships
-    public required Guid AddedBy { get; set; }
+    public required Guid UserId { get; set; }
     public virtual User User{ get; set; }
     public required Guid CategoryId { get; set; }
     public virtual Category Category { get; set; } = null!;
@@ -29,7 +29,7 @@ public class ProductBuilder : IEntityTypeConfiguration<Product>
 
         builder.HasOne(x => x.User)
             .WithMany(x => x.Products)
-            .HasForeignKey(x => x.AddedBy)
+            .HasForeignKey(x => x.UserId)
             .IsRequired()
             .OnDelete(DeleteBehavior.NoAction);
 

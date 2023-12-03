@@ -17,16 +17,16 @@ public static class DbInitializer
         UserManager<User> userManager,
         RoleManager<Role> roleManager)
     {
-        // Initialize roles first, if not already done
+        
         await SeedRoles(roleManager);
 
-        // Then seed users
-        await SeedUsers(userManager);
         
-        // Seed categories
+        await SeedUsers(userManager, roleManager);
+        
+        
         await SeedCategories(context);
         
-        // Seed products
+        
         await SeedProducts(context);
     }
 
@@ -74,12 +74,18 @@ public static class DbInitializer
             {
                 PermissionAction.Members_List,
                 PermissionAction.Members_Lockout,
+                PermissionAction.Category_Create,
+                PermissionAction.Category_Update,
+                PermissionAction.Category_Delete,
+                PermissionAction.Product_Create,
+                PermissionAction.Product_Update,
+                PermissionAction.Product_Delete
             },
             _ => new List<PermissionAction>()
         };
     }
 
-    private static async Task SeedUsers(UserManager<User> userManager)
+    private static async Task SeedUsers(UserManager<User> userManager, RoleManager<Role> roleManager)
     {
         if (await userManager.Users.AnyAsync())
             return;
@@ -88,18 +94,21 @@ public static class DbInitializer
         {
             new User
             {
+                Id = Guid.NewGuid(),
                 Name = "Admin",
                 UserName = "Admin",
                 Email = "admin@test.com"
             },
             new User
             {
+                Id = Guid.NewGuid(),
                 Name = "Member",
                 UserName = "Member",
                 Email = "Member@test.com"
             },
             new User
             {
+                Id = Guid.NewGuid(),
                 Name = "Ali",
                 Surname = "Shahbazi",
                 UserName = "VorTex",
@@ -113,32 +122,39 @@ public static class DbInitializer
 
         foreach (var user in users)
         {
-            var password = user.Email == "alishahbazi799@gmail.com" ? "Pa$$w0rd" : "123456";
+            var password = user.Email == "admin@test.com" ? "123456" : "1234567"; 
             var result = await userManager.CreateAsync(user, password);
 
             if (!result.Succeeded) continue;
 
             string roleName;
-            if (user.Email == "alishahbazi799@gmail.com")
+            switch (user.Email)
             {
-                roleName = SharedRolesVar.SuperAdmin;
-            }
-            else
-            {
-                switch (user.UserName)
-                {
-                    case SharedRolesVar.Admin:
-                        roleName = SharedRolesVar.Admin;
-                        break;
-                    case SharedRolesVar.Member:
-                        roleName = SharedRolesVar.Member;
-                        break;
-                    default:
-                        continue;
-                }
+                case "alishahbazi799@gmail.com":
+                    roleName = SharedRolesVar.SuperAdmin;
+                    break;
+                case "admin@test.com":
+                    roleName = SharedRolesVar.Admin;
+                    break;
+                default:
+                    continue;
             }
 
             await userManager.AddToRoleAsync(user, roleName);
+
+            // Adding RoleClaims for Admin
+            if (user.Email != "admin@test.com") 
+                continue;
+            
+            var adminRole = await roleManager.FindByNameAsync(SharedRolesVar.Admin);
+            if (adminRole == null) 
+                continue;
+            
+            var permissions = GetPermissionsForRole(SharedRolesVar.Admin);
+            foreach (var permission in permissions)
+            {
+                await userManager.AddClaimAsync(user, new Claim("Permission", permission.ToString()));
+            }
         }
     }
 
@@ -149,45 +165,58 @@ public static class DbInitializer
         {
             new Category
             {
+                Id = Guid.NewGuid(),
                 Name = "Electronics",
                 Description = "Electronics",
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                CreatedAt = DateTime.UtcNow,
+                UserId = (await dbContext.Users.SingleAsync(x => x.Email == _superAdminEmail)).Id
             },
             new Category
             {
+                Id = Guid.NewGuid(),
                 Name = "Clothing",
                 Description = "Clothing",
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                CreatedAt = DateTime.UtcNow,
+                UserId = (await dbContext.Users.SingleAsync(x => x.Email == _superAdminEmail)).Id
             },
             new Category
             {
+                Id = Guid.NewGuid(),
                 Name = "Home",
                 Description = "Home",
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                CreatedAt = DateTime.UtcNow,
+                UserId = (await dbContext.Users.SingleAsync(x => x.Email == _superAdminEmail)).Id
             },
             new Category
             {
+                Id = Guid.NewGuid(),
                 Name = "Sports",
                 Description = "Sports",
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                CreatedAt = DateTime.UtcNow,
+                UserId = (await dbContext.Users.SingleAsync(x => x.Email == _superAdminEmail)).Id
             },
             new Category
             {
+                Id = Guid.NewGuid(),
                 Name = "Toys",
                 Description = "Toys",
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                UserId = (await dbContext.Users.SingleAsync(x => x.Email == _superAdminEmail)).Id
             },
             new Category
             {
+                Id = Guid.NewGuid(),
                 Name = "Books",
                 Description = "Books",
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                CreatedAt = DateTime.UtcNow,
+                UserId = (await dbContext.Users.SingleAsync(x => x.Email == _superAdminEmail)).Id
             },
             new Category
             {
+                Id = Guid.NewGuid(),
                 Name = "Other",
                 Description = "Other",
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                CreatedAt = DateTime.UtcNow,
+                UserId = (await dbContext.Users.SingleAsync(x => x.Email == _superAdminEmail)).Id
             }
         };
         
@@ -202,241 +231,293 @@ public static class DbInitializer
         {
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 12 Pro Max",
                 Description = "Apple iPhone 12 Pro Max",
                 Price = 1099.99m,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Electronics"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                CreatedAt = DateTime.UtcNow,
                 Quantity = 30
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 12 Pro",
                 Description = "Apple iPhone 12 Pro",
                 Price = 999.99m,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Electronics"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                CreatedAt = DateTime.UtcNow,
                 Quantity = 35
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 12",
                 Description = "Apple iPhone 12",
                 Price = 799.99m,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Electronics"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                CreatedAt = DateTime.UtcNow,
                 Quantity = 40
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 11 Pro Max",
                 Description = "Apple iPhone 11 Pro Max",
                 Price = 899.99m,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Electronics"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                CreatedAt = DateTime.UtcNow,
                 Quantity = 45
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 11 Pro",
                 Description = "Apple iPhone 11 Pro",
                 Price = 799.99m,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Electronics"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                CreatedAt = DateTime.UtcNow,
                 Quantity = 50
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 11",
                 Description = "Apple iPhone 11",
                 Price = 699.99m,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Electronics"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                CreatedAt = DateTime.UtcNow,
                 Quantity = 55
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Apple iPhone X",
                 Description = "Apple iPhone X",
                 Price = 599.99m,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Electronics"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                CreatedAt = DateTime.UtcNow,
                 Quantity = 60
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 8",
                 Description = "Apple iPhone 8",
                 Price = 499.99m,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Electronics"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                CreatedAt = DateTime.UtcNow,
                 Quantity = 65
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 7",
                 Description = "Apple iPhone 7",
                 Price = 399.99m,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Electronics"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                CreatedAt = DateTime.UtcNow,
                 Quantity = 70
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 6",
                 Description = "Apple iPhone 6",
                 Price = 299.99m,
                 Quantity = 34,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Electronics"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                CreatedAt = DateTime.UtcNow,
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 5",
                 Description = "Apple iPhone 5",
                 Price = 199.99m,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Electronics"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                CreatedAt = DateTime.UtcNow,
                 Quantity = 75
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 4",
                 Description = "Apple iPhone 4",
                 Price = 99.99m,
+                CreatedAt = DateTime.UtcNow,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Electronics"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty,
                 Quantity = 90
             },
             // Clothing
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Nike Air Max 270",
                 Description = "Nike Air Max 270",
                 Price = 149.99m,
                 Quantity = 30,
+                CreatedAt = DateTime.UtcNow,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Clothing"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Nike Air Max 720",
                 Description = "Nike Air Max 720",
                 Price = 199.99m,
                 Quantity = 35,
+                CreatedAt = DateTime.UtcNow,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Clothing"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Nike Air Max 90",
                 Description = "Nike Air Max 90",
                 Price = 99.99m,
                 Quantity = 40,
+                CreatedAt = DateTime.UtcNow,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Clothing"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Nike Air Max 95",
                 Description = "Nike Air Max 95",
                 Price = 129.99m,
                 Quantity = 45,
+                CreatedAt = DateTime.UtcNow,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Clothing"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Nike Air Max 97",
                 Description = "Nike Air Max 97",
                 Price = 149.99m,
                 Quantity = 50,
+                CreatedAt = DateTime.UtcNow,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Clothing"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             },
             // Home
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Dyson V11",
                 Description = "Dyson V11",
                 Price = 599.99m,
                 Quantity = 30,
+                CreatedAt = DateTime.UtcNow,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Home"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Dyson V10",
                 Description = "Dyson V10",
                 Price = 499.99m,
                 Quantity = 35,
+                CreatedAt = DateTime.UtcNow,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Home"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             },
             // Toys
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Lego Star Wars",
                 Description = "Lego Star Wars",
                 Price = 99.99m,
                 Quantity = 30,
+                CreatedAt = DateTime.UtcNow,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Toys"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             },
             // Books
             new Product
             {
+                Id = Guid.NewGuid(),
                 Name = "Harry Potter",
                 Description = "Harry Potter",
                 Price = 19.99m,
                 Quantity = 30,
+                CreatedAt = DateTime.UtcNow,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Books"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             },
             new Product
             {
+                Id = Guid.NewGuid(),
                 Name = "Harry Potter 2",
                 Description = "Harry Potter 2",
                 Price = 19.99m,
                 Quantity = 30,
+                CreatedAt = DateTime.UtcNow,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Books"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Harry Potter 3",
                 Description = "Harry Potter 3",
                 Price = 19.99m,
                 Quantity = 30,
+                CreatedAt = DateTime.UtcNow,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Books"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Harry Potter 4",
                 Description = "Harry Potter 4",
                 Price = 19.99m,
                 Quantity = 30,
+                CreatedAt = DateTime.UtcNow,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Books"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Harry Potter 5",
                 Description = "Harry Potter 5",
                 Price = 19.99m,
                 Quantity = 30,
+                CreatedAt = DateTime.UtcNow,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Books"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             },
             new()
             {
+                Id = Guid.NewGuid(),
                 Name = "Harry Potter 6",
                 Description = "Harry Potter 6",
                 Price = 19.99m,
                 Quantity = 30,
+                CreatedAt = DateTime.UtcNow,
                 CategoryId = (await dbContext.Categories.FirstOrDefaultAsync(x => x.Name == "Books"))?.Id ?? Guid.Empty,
-                AddedBy = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
+                UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             }
         };
         
