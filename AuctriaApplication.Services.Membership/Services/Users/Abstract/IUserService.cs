@@ -32,7 +32,7 @@ public interface IUserService
     
     Task<bool> LockOutAsync(
         Guid targetUserId, 
-        int lockOutTime);
+        int days);
 
     Task<bool> UnLockAsync(Guid targetUserId);
 

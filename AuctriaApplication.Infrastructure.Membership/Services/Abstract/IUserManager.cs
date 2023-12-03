@@ -22,4 +22,10 @@ public interface IUserManager
     Task<Result<string>> SendSmsVerificationAsync(string userPhone);
 
     Task<Result<string>> VerifyPhoneAsync(string userCode);
+
+    Task<Result<string>> LockoutUserAsync(
+        Guid targetUserId,
+        int days);
+
+    Task<Result<string>> UnLockoutUserAsync(Guid targetUserId);
 }

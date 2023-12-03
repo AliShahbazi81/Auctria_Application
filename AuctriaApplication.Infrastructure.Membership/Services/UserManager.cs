@@ -149,4 +149,43 @@ public class UserManager : IUserManager
             ? Result<string>.Failure(verification.Item2!)
             : Result<string>.Success("Your phone has been verified!");
     }
+
+    public async Task<Result<string>> LockoutUserAsync(
+        Guid targetUserId, 
+        int days)
+    {
+        // Check if the user is locked
+        if(await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))
+            return Result<string>.Failure("Your account is locked!");
+        
+        // Check if the target user is locked
+        if (await _userService.IsUserLockedAsync(targetUserId))
+            return Result<string>.Failure("The selected user is already locked!");
+        
+        // Lock target user
+        var lockStatus = await _userService.LockOutAsync(targetUserId, days);
+        
+        return !lockStatus 
+            ? Result<string>.Failure("We could not lock the user you selected!") 
+            : Result<string>.Success("The selected user has been locked");
+    }
+    
+    public async Task<Result<string>> UnLockoutUserAsync(Guid targetUserId)
+    {
+        // Check if the user is locked
+        if(await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))
+            return Result<string>.Failure("Your account is locked!");
+        
+        // Check if the target user is not locked
+        if (!await _userService.IsUserLockedAsync(targetUserId))
+            return Result<string>.Failure("The selected user is not locked!");
+        
+        // UnLock target user
+        var lockStatus = await _userService.UnLockAsync(targetUserId);
+        
+        return !lockStatus 
+            ? Result<string>.Failure("We could not unlock the user you selected!") 
+            : Result<string>.Success("The selected user has been unlocked");
+    }
+    
 }

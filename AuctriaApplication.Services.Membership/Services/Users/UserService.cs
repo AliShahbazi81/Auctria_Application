@@ -250,7 +250,7 @@ public class UserService : IUserService
     
     public async Task<bool> LockOutAsync(
         Guid targetUserId, 
-        int lockOutTime)
+        int days)
     {
         await using var dbContext = await _context.CreateDbContextAsync();
 
@@ -261,7 +261,7 @@ public class UserService : IUserService
             throw new UserNotFoundException();
 
         user.LockoutEnabled = true;
-        user.LockoutEnd = DateTime.UtcNow.AddDays(lockOutTime);
+        user.LockoutEnd = DateTime.UtcNow.AddDays(days);
 
         return await dbContext.SaveChangesAsync() > 0;
     }
