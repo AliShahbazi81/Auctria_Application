@@ -37,6 +37,17 @@ public class ShoppingCartService : IShoppingCartService
         return ToViewModel(cart);
     }
 
+    public async Task<decimal> GetCostAsync(Guid shoppingCartId)
+    {
+        await using var dbContext = await _context.CreateDbContextAsync();
+
+        return await dbContext.Carts
+            .AsNoTracking()
+            .Where(x => x.Id == shoppingCartId)
+            .Select(x => x.Total)
+            .SingleAsync();
+    }
+
     public async Task<IEnumerable<ShoppingCartViewModel>> GetListAsync(
         Guid userId, 
         CancellationToken cancellationToken)
@@ -89,9 +100,10 @@ public class ShoppingCartService : IShoppingCartService
     {
         await using var dbContext = await _context.CreateDbContextAsync(cancellationToken);
         return await dbContext.Carts
+            .Include(x => x.Payment)
             .FirstOrDefaultAsync(c => 
                 c.UserId == userId && 
-                c.PaymentStatus == PaymentStatus.Pending, 
+                c.Payment.PaymentStatus != PaymentStatus.Succeeded, 
                 cancellationToken);
     }
 
@@ -103,7 +115,6 @@ public class ShoppingCartService : IShoppingCartService
         var newCart = new Cart
         {
             UserId = userId,
-            PaymentStatus = PaymentStatus.Pending,
             Total = 0
         };
         dbContext.Carts.Add(newCart);
@@ -128,13 +139,53 @@ public class ShoppingCartService : IShoppingCartService
         }
     }
     
+    public async Task<bool> AreItemsReducedAsync(Guid shoppingCartId)
+    {
+        await using var dbContext = await _context.CreateDbContextAsync();
+        
+        var cart = await dbContext.Carts
+            .Include(c => c.ProductCarts)
+            .ThenInclude(pc => pc.Product)
+            .FirstOrDefaultAsync(c => c.Id == shoppingCartId);
+
+        if (cart == null) 
+            return true;
+        
+        foreach (var productCart in cart.ProductCarts)
+        {
+            // If quantity is more than available, throw exception
+            if (productCart.Quantity > productCart.Product.Quantity)
+                throw new NotEnoughQuantityException(productCart.Product.Name);
+            
+            productCart.Product.Quantity -= productCart.Quantity;
+        }
+        
+        return await dbContext.SaveChangesAsync() > 0;
+    }
+
+    public async Task<bool> IsShoppingCartAsync(Guid shoppingCartId)
+    {
+        await using var dbContext = await _context.CreateDbContextAsync();
+
+        var shoppingCart = await dbContext.Carts
+            .AsNoTracking()
+            .Select(x => new
+            {
+                x.Id
+            })
+            .AnyAsync(x =>
+                x.Id == shoppingCartId);
+
+        return shoppingCart;
+    }
+    
     public ShoppingCartViewModel ToViewModel(Cart cart)
     {
         return new ShoppingCartViewModel
         {
             Id = cart.Id,
             Total = cart.Total.ToString("N0"),
-            PaymentStatus = cart.PaymentStatus.ToString(),
+            PaymentStatus = cart.Payment.PaymentStatus.ToString(),
             CreatedAt = Convert.ToDateTime(cart.CreatedAt.ToLocalTime()
                 .ToString("G")),
         };

@@ -17,8 +17,13 @@ public class UserAccessor : IUserAccessor
         return Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty);
     }
     
-    public string? GetUserEmail()
+    public string GetUserEmail()
     {
-        return _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email);
+        return _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Email)!;
+    }
+    
+    public string GetUserUsername()
+    {
+        return _httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.Name)!;
     }
 }

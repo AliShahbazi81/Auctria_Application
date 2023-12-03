@@ -12,6 +12,7 @@ using AuctriaApplication.Services.MessagingAPI.Services.Email;
 using AuctriaApplication.Services.MessagingAPI.Services.Sms;
 using AuctriaApplication.Services.MessagingAPI.Templates.Email;
 using AuctriaApplication.Services.MessagingAPI.Templates.Sms;
+using AuctriaApplication.Services.Validation.Services.Phone;
 
 namespace AuctriaApplication.Infrastructure.Membership.Services;
 
@@ -55,6 +56,15 @@ public class UserManager : IUserManager
 
         return Result<UserDto>.Success(user);
     }
+
+    public async Task<Result<UserDto>> RegisterOrLoginAsync(RegisterOrLoginDto userDto)
+    {
+        var loggedInUserDto = await _userService.RegisterOrLoginAsync(userDto);
+        
+        return loggedInUserDto is null 
+            ? Result<UserDto>.Failure("Invalid credentials") 
+            : Result<UserDto>.Success(loggedInUserDto);
+    }
     
     public async Task<Result<string>> SendEmailVerificationAsync(
         Guid userId,
@@ -71,8 +81,7 @@ public class UserManager : IUserManager
         var emailTemplate = EmailTemplate.Verification(generatedCode, userFirstName);
 
         // Send email verification along with code to user
-        if (!await _emailService.SendEmailAsync(userEmail, emailTemplate, "Verification Code",
-                cancellationToken))
+        if (!await _emailService.SendEmailAsync(userEmail, emailTemplate, "Verification Code"))
             return Result<string>.Failure("Failed to send verification code!");
 
         // Save the verification code for user
@@ -98,6 +107,10 @@ public class UserManager : IUserManager
         string userPhone,
         CancellationToken cancellationToken = default)
     {
+        // Check if phone number is valid
+        if(!PhoneValidationService.IsPhoneNumberValid(userPhone))
+            return Result<string>.Failure("Sorry, but it seems the phone number you entered is not valid");
+        
         // Check if user has already verified their Phone Number already
         if (await _userService.IsFieldVerifiedAsync(userId, SharedUserFieldsVar.PhoneNumberConfirmed))
             return Result<string>.Failure("Your Phone number has ben verified already!");

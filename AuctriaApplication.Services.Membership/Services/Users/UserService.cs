@@ -1,26 +1,32 @@
 ﻿using System.Linq.Expressions;
 using AuctriaApplication.DataAccess.DbContext;
 using AuctriaApplication.DataAccess.Entities.Users;
+using AuctriaApplication.Domain.Helper;
+using AuctriaApplication.Domain.Variables;
 using AuctriaApplication.Services.Membership.Dto;
 using AuctriaApplication.Services.Membership.Dto.ViewModel;
 using AuctriaApplication.Services.Membership.Exceptions;
 using AuctriaApplication.Services.Membership.Services.Token;
 using AuctriaApplication.Services.Membership.Services.Users.Abstract;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuctriaApplication.Services.Membership.Services.Users;
 
 public class UserService : IUserService
 {
+    private readonly UserManager<User> _userManager;
     private readonly IDbContextFactory<ApplicationDbContext> _context;
     private readonly ITokenService _tokenService;
 
     public UserService(
         IDbContextFactory<ApplicationDbContext> context,
-        ITokenService tokenService)
+        ITokenService tokenService, 
+        UserManager<User> userManager)
     {
         _context = context;
         _tokenService = tokenService;
+        _userManager = userManager;
     }
     
     public async Task<List<UserViewModel>> GetListAsync()
@@ -50,6 +56,74 @@ public class UserService : IUserService
             .ToListAsync();
 
         return userList;
+    }
+    
+    public async Task<UserDto?> RegisterOrLoginAsync(RegisterOrLoginDto registerOrLoginDto)
+    {
+        await using var dbContext = await _context.CreateDbContextAsync();
+
+        registerOrLoginDto.Email = StringHelper.ConvertToLowerCaseNoSpaces(registerOrLoginDto.Email)!;
+
+        // Check if the user already exists
+        var user = await dbContext.User
+            .SingleOrDefaultAsync(u => u.Email!
+                .ToLower()
+                .Replace(" ", "") == registerOrLoginDto.Email);
+
+        if (user != null)
+        {
+            // Check if user is lockout, return null
+            if(user.LockoutEnabled && user.LockoutEnd > DateTime.Now)
+                throw new Exception("Your account is locked and it will be unlocked at " + user.LockoutEnd);
+            
+                // For regular login, check the password
+                var passwordCheck = await _userManager.CheckPasswordAsync(user, registerOrLoginDto.Password);
+                if (!passwordCheck)
+                    return null; // Password mismatch
+
+            // Create UserDto for existing user
+            return await ToUserDto(user, dbContext);
+        }
+
+        // Register new user
+        var newUser = new User
+        {
+            Name = registerOrLoginDto.Name,
+            Surname = registerOrLoginDto.Surname,
+            Email = registerOrLoginDto.Email,
+            UserName = registerOrLoginDto.Username,
+            PhoneNumber = registerOrLoginDto.PhoneNumber,
+            LockoutEnabled = false,
+            TwoFactorEnabled = false
+        };
+
+        // Set password for regular user
+        var createResult = await _userManager.CreateAsync(newUser, registerOrLoginDto.Password);
+
+        if (!createResult.Succeeded)
+            return null; // User creation failed
+
+        // Assign role "Member"
+        await _userManager.AddToRoleAsync(newUser, SharedRolesVar.Member);
+
+        await dbContext.SaveChangesAsync();
+
+        // Create UserDto for new user
+        return await ToUserDto(newUser, dbContext);
+    }
+
+    private async Task<UserDto> ToUserDto(User user, ApplicationDbContext dbContext)
+    {
+        return new UserDto
+        {
+            Username = user.UserName,
+            Token = await _tokenService.GenerateAsync(user),
+            Role = (await UserRoleAsync(user.Id, dbContext))!,
+            IsPhoneVerified = user.PhoneNumberConfirmed,
+            IsEmailVerified = user.EmailConfirmed,
+            IsTwoFactorEnabled = user.TwoFactorEnabled,
+            IsLock = user.LockoutEnabled
+        };
     }
 
     public async Task<UserDto> CurrentUserAsync(Guid userId)

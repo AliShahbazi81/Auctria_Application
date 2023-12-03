@@ -6,6 +6,9 @@ namespace AuctriaApplication.Services.Membership.Services.Users.Abstract;
 public interface IUserService
 {
     Task<List<UserViewModel>> GetListAsync();
+
+    Task<UserDto?> RegisterOrLoginAsync(RegisterOrLoginDto registerOrLoginDto);
+    
     
     Task<UserDto> CurrentUserAsync(Guid userId);
 

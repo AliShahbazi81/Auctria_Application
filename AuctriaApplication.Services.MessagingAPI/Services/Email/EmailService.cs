@@ -18,8 +18,7 @@ public class EmailService : IEmailService
     public async Task<bool> SendEmailAsync(
         string userEmail,
         string emailTemplate,
-        string emailSubject,
-        CancellationToken cancellationToken = default)
+        string emailSubject)
     {
         var email = new MimeMessage();
         email.From.Add(MailboxAddress.Parse(_config["EmailCredentials:Email"]));
@@ -35,23 +34,14 @@ public class EmailService : IEmailService
         await smtp.ConnectAsync(
             _config["EmailCredentials:Host"],
             587, 
-            SecureSocketOptions.StartTls,
-            cancellationToken);
-        
-        // Check if the task has been cancelled
-        if (cancellationToken.IsCancellationRequested)
-        {
-            await smtp.DisconnectAsync(true, cancellationToken);
-            cancellationToken.ThrowIfCancellationRequested();
-        }
+            SecureSocketOptions.StartTls);
 
         await smtp.AuthenticateAsync(
             _config["EmailCredentials:Email"],
-            _config["EmailCredentials:Password"], 
-            cancellationToken);
+            _config["EmailCredentials:Password"]);
 
-        await smtp.SendAsync(email, cancellationToken);
-        await smtp.DisconnectAsync(true, cancellationToken);
+        await smtp.SendAsync(email);
+        await smtp.DisconnectAsync(true);
 
         return true;
     }

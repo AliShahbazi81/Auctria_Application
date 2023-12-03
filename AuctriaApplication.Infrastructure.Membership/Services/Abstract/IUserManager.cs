@@ -10,6 +10,8 @@ public interface IUserManager
 
     Task<Result<UserDto>> GetCurrentUserAsync();
 
+    Task<Result<UserDto>> RegisterOrLoginAsync(RegisterOrLoginDto userDto);
+
     Task<Result<string>> SendEmailVerificationAsync(
         Guid userId,
         string userEmail,

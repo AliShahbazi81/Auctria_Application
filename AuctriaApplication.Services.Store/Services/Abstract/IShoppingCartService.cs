@@ -14,7 +14,8 @@ public interface IShoppingCartService
     Task<IEnumerable<ShoppingCartViewModel>> GetListAsync(
         Guid userId,
         CancellationToken cancellationToken);
-    
+
+    Task<decimal> GetCostAsync(Guid shoppingCartId);
     
     Task<bool> AddOrUpdateProductInCartAsync(
         Guid cartId, 
@@ -33,6 +34,10 @@ public interface IShoppingCartService
     Task UpdateCartTotalAsync(
         Guid cartId,
         CancellationToken cancellationToken);
+
+    Task<bool> AreItemsReducedAsync(Guid shoppingCartId);
+
+    Task<bool> IsShoppingCartAsync(Guid shoppingCartId);
 
     ShoppingCartViewModel ToViewModel(Cart cart);
     
