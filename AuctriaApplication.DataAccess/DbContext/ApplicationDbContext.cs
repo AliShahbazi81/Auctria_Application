@@ -1,5 +1,4 @@
-﻿using AuctriaApplication.DataAccess.Entities;
-using AuctriaApplication.DataAccess.Entities.Stores;
+﻿using AuctriaApplication.DataAccess.Entities.Stores;
 using AuctriaApplication.DataAccess.Entities.Users;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +10,14 @@ public class ApplicationDbContext : IdentityDbContext<User, Role, Guid>
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
         
+    }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.ApplyConfiguration(new CartBuilder());
+        modelBuilder.ApplyConfiguration(new PaymentBuilder());
     }
     
     // User

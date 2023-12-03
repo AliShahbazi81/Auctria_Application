@@ -5,6 +5,7 @@ namespace AuctriaApplication.DataAccess.Entities.Stores;
 
 public class ProductCart
 {
+    public Guid Id { get; set; }
     public required int Quantity { get; set; }
     public required Guid CartId { get; set; }
     public virtual Cart Cart { get; set; }
