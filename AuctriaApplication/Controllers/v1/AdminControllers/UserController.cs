@@ -2,7 +2,6 @@
 using AuctriaApplication.Domain.Enums;
 using AuctriaApplication.Infrastructure.Membership.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Tls;
 
 namespace Auctria_Application.Controllers.v1.AdminControllers;
 

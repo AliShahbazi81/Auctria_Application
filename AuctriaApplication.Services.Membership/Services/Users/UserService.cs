@@ -282,6 +282,26 @@ public class UserService : IUserService
         return await dbContext.SaveChangesAsync() > 0;
     }
     
+    public async Task<IEnumerable<string?>> GetSuperAdminEmailsAsync()
+    {
+        await using var dbContext = await _context.CreateDbContextAsync();
+    
+        var emails = await dbContext.Users
+            .Join(dbContext.UserRoles, 
+                user => user.Id, 
+                userRole => userRole.UserId, 
+                (user, userRole) => new { user, userRole })
+            .Join(dbContext.Roles,
+                userRole => userRole.userRole.RoleId,
+                role => role.Id,
+                (userRole, role) => new { userRole.user, role.Name })
+            .Where(ur => ur.Name == SharedRolesVar.SuperAdmin && ur.user.Email != null) 
+            .Select(ur => ur.user.Email)
+            .ToListAsync();
+
+        return emails.Where(email => email != null);
+    }
+    
     public async Task<bool> IsUserLockedAsync(
         Guid? userId = null, 
         string? email = null)

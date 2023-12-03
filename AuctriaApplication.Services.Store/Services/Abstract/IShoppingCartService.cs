@@ -35,7 +35,7 @@ public interface IShoppingCartService
         Guid cartId,
         CancellationToken cancellationToken);
 
-    Task<bool> AreItemsReducedAsync(Guid shoppingCartId);
+    Task<(bool, Dictionary<string, int>?)> AreItemsReducedAsync(Guid shoppingCartId);
 
     Task<bool> IsShoppingCartAsync(Guid shoppingCartId);
 

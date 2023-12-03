@@ -139,7 +139,7 @@ public class ShoppingCartService : IShoppingCartService
         }
     }
     
-    public async Task<bool> AreItemsReducedAsync(Guid shoppingCartId)
+    public async Task<(bool, Dictionary<string, int>?)> AreItemsReducedAsync(Guid shoppingCartId)
     {
         await using var dbContext = await _context.CreateDbContextAsync();
         
@@ -149,7 +149,7 @@ public class ShoppingCartService : IShoppingCartService
             .FirstOrDefaultAsync(c => c.Id == shoppingCartId);
 
         if (cart == null) 
-            return true;
+            return (true, null);
         
         foreach (var productCart in cart.ProductCarts)
         {
@@ -160,7 +160,20 @@ public class ShoppingCartService : IShoppingCartService
             productCart.Product.Quantity -= productCart.Quantity;
         }
         
-        return await dbContext.SaveChangesAsync() > 0;
+        var isSaved = await dbContext.SaveChangesAsync() > 0;
+
+        if (!isSaved)
+            return (false, null);
+        
+        // Get the items which quantities are less than 10
+        var items = await GetItemsAsync(shoppingCartId);
+        var lowQuantityProducts = 
+            items
+                .Where(item => item.Quantity <= 10)
+                .ToDictionary(item => item.Name, item => item.Quantity);
+
+        // Return both the reduction status and the dictionary of low quantity products
+        return (true, lowQuantityProducts);
     }
 
     public async Task<bool> IsShoppingCartAsync(Guid shoppingCartId)
@@ -189,5 +202,21 @@ public class ShoppingCartService : IShoppingCartService
             CreatedAt = Convert.ToDateTime(cart.CreatedAt.ToLocalTime()
                 .ToString("G")),
         };
+    }
+
+    private async Task<IEnumerable<Product>> GetItemsAsync(Guid shoppingCartId)
+    {
+        await using var dbContext = await _context.CreateDbContextAsync();
+
+        var shoppingCartItems = await dbContext.Carts
+            .AsNoTracking()
+            .Include(x => x.ProductCarts)
+            .ThenInclude(x => x.Product)
+            .Where(x => x.Id == shoppingCartId)
+            .SelectMany(x => x.ProductCarts)
+            .Select(pc => pc.Product)
+            .ToListAsync();
+
+        return shoppingCartItems;
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace AuctriaApplication.Services.MessagingAPI.Templates.Email;
+﻿using System.Text;
+
+namespace AuctriaApplication.Services.MessagingAPI.Templates.Email;
 
 public static class EmailTemplate
 {
@@ -76,4 +78,36 @@ public static class EmailTemplate
 
         return emailBody;
     }
+
+    public static string QuantityAlert(string[] itemNames, int[] quantities)
+    {
+        var commonStyles = GetCommonStyles();
+        var itemsListBuilder = new StringBuilder();
+
+        for (var i = 0; i < itemNames.Length; i++)
+        {
+            itemsListBuilder.AppendLine($"<li>{itemNames[i]} - Quantity: {quantities[i]}</li>");
+        }
+
+        var emailBody = $@"
+        <html>
+        <head>
+            {commonStyles}
+        </head>
+        <body>
+            <div class='container'>
+                <h1>Low quantity alert</h1>
+                <p>Dear Admin,</p>
+                <p>The following items have low quantities:</p>
+                <ul>
+                    {itemsListBuilder}
+                </ul>
+                <p>Please restock them as soon as possible.</p>
+            </div>
+        </body>
+        </html>";
+
+        return emailBody;
+    }
+
 }

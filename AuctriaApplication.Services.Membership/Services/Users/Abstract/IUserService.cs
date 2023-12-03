@@ -36,6 +36,9 @@ public interface IUserService
 
     Task<bool> UnLockAsync(Guid targetUserId);
 
+    Task<IEnumerable<string?>> GetSuperAdminEmailsAsync();
+    
+
     Task<bool> IsUserLockedAsync(
         Guid? userId = null,
         string? email = null);
