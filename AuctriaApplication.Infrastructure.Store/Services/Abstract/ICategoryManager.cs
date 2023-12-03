@@ -13,7 +13,7 @@ public interface ICategoryManager
 
     Task<Result<IEnumerable<CategoryViewModel>>> GetCategoryListAsync(
         CancellationToken cancellationToken,
-        string categoryName);
+        string? categoryName = null);
 
     Task<Result<CategoryViewModel>> CreateCategoryAsync(
         CategoryDto categoryDto,

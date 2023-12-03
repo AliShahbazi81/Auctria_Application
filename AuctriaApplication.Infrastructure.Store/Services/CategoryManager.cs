@@ -45,7 +45,7 @@ public class CategoryManager : ICategoryManager
 
     public async Task<Result<IEnumerable<CategoryViewModel>>> GetCategoryListAsync(
         CancellationToken cancellationToken, 
-        string categoryName)
+        string? categoryName = null)
     {
         // Check if user is locked
         if (await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))

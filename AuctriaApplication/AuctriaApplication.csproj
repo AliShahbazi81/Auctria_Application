@@ -18,7 +18,6 @@
 
     <ItemGroup>
       <Folder Include="Controllers\v1\PaymentControllers\" />
-      <Folder Include="Controllers\v1\StoreControllers\" />
     </ItemGroup>
 
     <ItemGroup>
