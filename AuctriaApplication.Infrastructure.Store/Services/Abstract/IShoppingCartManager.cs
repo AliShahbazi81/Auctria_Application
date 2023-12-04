@@ -29,4 +29,6 @@ public interface IShoppingCartManager
         Guid productId,
         int quantity,
         CancellationToken cancellationToken);
+
+    Task<Result<string>> DeleteCartAsync(Guid cartId);
 }

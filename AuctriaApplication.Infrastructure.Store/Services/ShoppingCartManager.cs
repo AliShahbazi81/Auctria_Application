@@ -103,4 +103,23 @@ public class ShoppingCartManager : IShoppingCartManager
 
         return Result<ShoppingCartViewModel>.Success(updatedCartViewModel);
     }
+
+    public async Task<Result<string>> DeleteCartAsync(Guid cartId)
+    {
+        // Check if user is locked or has any restrictions
+        if (await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))
+            return Result<string>.Failure("User account is locked.");
+        
+        // Check the cart is paid
+        var isPaid = await _shoppingCartService.IsCartPaidAsync(cartId);
+        if (isPaid is true)
+            return Result<string>.Failure("Sorry, but you cannot delete a paid cart.");
+
+        // Delete cart
+        var deleteResult = await _shoppingCartService.DeleteCartAsync(_userAccessor.GetUserId(), cartId);
+
+        return !deleteResult 
+            ? Result<string>.Failure("We could not find the cart. It's either deleted or does not exist.") 
+            : Result<string>.Success("Cart deleted successfully.");
+    }
 }

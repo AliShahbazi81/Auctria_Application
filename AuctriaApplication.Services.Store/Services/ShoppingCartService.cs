@@ -47,6 +47,19 @@ public class ShoppingCartService : IShoppingCartService
             .Select(x => x.Total)
             .SingleAsync();
     }
+    
+    public async Task<Cart?> GetCartForUserAsync(
+        Guid userId,
+        CancellationToken cancellationToken)
+    {
+        await using var dbContext = await _context.CreateDbContextAsync(cancellationToken);
+        return await dbContext.Carts
+            .Include(x => x.Payment)
+            .FirstOrDefaultAsync(c =>
+                    c.UserId == userId && 
+                    c.Payment.PaymentStatus != PaymentStatus.Succeeded, 
+                cancellationToken);
+    }
 
     public async Task<IEnumerable<ShoppingCartViewModel>> GetListAsync(
         Guid userId, 
@@ -106,19 +119,7 @@ public class ShoppingCartService : IShoppingCartService
         return true;
     }
     
-    public async Task<Cart?> GetCartForUserAsync(
-        Guid userId,
-        CancellationToken cancellationToken)
-    {
-        await using var dbContext = await _context.CreateDbContextAsync(cancellationToken);
-        return await dbContext.Carts
-            .Include(x => x.Payment)
-            .FirstOrDefaultAsync(c =>
-                c.UserId == userId && 
-                c.Payment.PaymentStatus != PaymentStatus.Succeeded, 
-                cancellationToken);
-    }
-
+    
     public async Task<Cart> CreateCartForUserAsync(
         Guid userId, 
         CancellationToken cancellationToken)
@@ -152,6 +153,45 @@ public class ShoppingCartService : IShoppingCartService
             cart.Total = cart.ProductCarts.Sum(pc => pc.Quantity * pc.Product.Price);
             await dbContext.SaveChangesAsync(cancellationToken);
         }
+    }
+    
+    public async Task<bool> DeleteCartAsync(
+        Guid userId,
+        Guid cartId)
+    {
+        await using var dbContext = await _context.CreateDbContextAsync();
+        var cart = await dbContext.Carts
+            .Include(c => c.ProductCarts)
+            .FirstOrDefaultAsync(c => 
+                c.Id == cartId && 
+                c.UserId == userId);
+
+        if (cart == null) 
+            return false;
+        
+        dbContext.Carts.Remove(cart);
+        await dbContext.SaveChangesAsync();
+        return true;
+    }
+    
+    public ShoppingCartViewModel ToViewModel(Cart cart)
+    {
+        return new ShoppingCartViewModel
+        {
+            Id = cart.Id,
+            Total = cart.Total.ToString("N2"),
+            PaymentStatus = cart.Payment != null! ? cart.Payment.PaymentStatus.ToString() : PaymentStatus.Pending.ToString(),
+            CreatedAt = Convert.ToDateTime(cart.CreatedAt.ToLocalTime()
+                .ToString("G")),
+            Products = cart.ProductCarts.Select(pc => new ProductCartItemViewModel
+            {
+                ProductId = pc.Id,
+                Name = pc.Product.Name,
+                ImageUrl = pc.Product.ImageUrl ?? string.Empty,
+                Price = pc.Product.Price,
+                Quantity = pc.Quantity
+            }).ToList()
+        };
     }
     
     public async Task<(bool, Dictionary<string, int>?)> AreItemsReducedAsync(Guid shoppingCartId)
@@ -190,7 +230,7 @@ public class ShoppingCartService : IShoppingCartService
         // Return both the reduction status and the dictionary of low quantity products
         return (true, lowQuantityProducts);
     }
-
+    
     public async Task<bool> IsShoppingCartAsync(Guid shoppingCartId)
     {
         await using var dbContext = await _context.CreateDbContextAsync();
@@ -206,27 +246,27 @@ public class ShoppingCartService : IShoppingCartService
 
         return shoppingCart;
     }
-    
-    public ShoppingCartViewModel ToViewModel(Cart cart)
-    {
-        return new ShoppingCartViewModel
-        {
-            Id = cart.Id,
-            Total = cart.Total.ToString("N2"),
-            PaymentStatus = cart.Payment != null! ? cart.Payment.PaymentStatus.ToString() : PaymentStatus.Pending.ToString(),
-            CreatedAt = Convert.ToDateTime(cart.CreatedAt.ToLocalTime()
-                .ToString("G")),
-            Products = cart.ProductCarts.Select(pc => new ProductCartItemViewModel
-            {
-                ProductId = pc.Id,
-                Name = pc.Product.Name,
-                ImageUrl = pc.Product.ImageUrl ?? string.Empty,
-                Price = pc.Product.Price,
-                Quantity = pc.Quantity
-            }).ToList()
-        };
-    }
 
+    public async Task<bool?> IsCartPaidAsync(Guid cartId)
+    {
+        await using var dbContext = await _context.CreateDbContextAsync();
+
+        var cart = await dbContext.Carts
+            .AsNoTracking()
+            .Include(x => x.Payment)
+            .Select(x => new
+            {
+                x.Id,
+                PaymentStatus = (PaymentStatus?)x.Payment.PaymentStatus
+            })
+            .SingleOrDefaultAsync(x => x.Id == cartId);
+
+        if (cart is null)
+            return null;
+        
+        return cart.PaymentStatus == PaymentStatus.Succeeded;
+    }
+    
     private async Task<IEnumerable<Product>> GetItemsAsync(Guid shoppingCartId)
     {
         await using var dbContext = await _context.CreateDbContextAsync();

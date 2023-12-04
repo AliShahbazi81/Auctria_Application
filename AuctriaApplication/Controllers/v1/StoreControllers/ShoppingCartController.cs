@@ -66,4 +66,21 @@ public class ShoppingCartController : BaseApiController
             throw;
         }
     }
+    
+    [HttpDelete("Delete")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Delete(Guid cartId)
+    {
+        try
+        {
+            return HandleResult(await _shoppingCartManager.DeleteCartAsync(cartId));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"Error while trying to delete the shopping cart. Error: {e.Message}");
+            throw;
+        }
+    }
 }

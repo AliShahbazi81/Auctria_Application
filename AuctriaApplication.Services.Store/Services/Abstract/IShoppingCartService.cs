@@ -81,6 +81,10 @@ public interface IShoppingCartService
         Guid cartId,
         CancellationToken cancellationToken);
 
+    Task<bool> DeleteCartAsync(
+        Guid userId,
+        Guid cartId);
+
     /// <summary>
     /// Asynchronously checks if items in a shopping cart are reduced and returns a dictionary of low quantity products.
     /// </summary>
@@ -101,5 +105,7 @@ public interface IShoppingCartService
     /// <param name="cart">The Cart entity to convert.</param>
     /// <returns>The ShoppingCartViewModel.</returns>
     ShoppingCartViewModel ToViewModel(Cart cart);
-    
+
+    Task<bool?> IsCartPaidAsync(Guid cartId);
+
 }
