@@ -85,6 +85,11 @@ public interface IShoppingCartService
         Guid userId,
         Guid cartId);
 
+    Task<bool> DeleteItemInCartAsync(
+        Guid userId,
+        Guid cartId,
+        Guid productId);
+
     /// <summary>
     /// Asynchronously checks if items in a shopping cart are reduced and returns a dictionary of low quantity products.
     /// </summary>

@@ -122,4 +122,31 @@ public class ShoppingCartManager : IShoppingCartManager
             ? Result<string>.Failure("We could not find the cart. It's either deleted or does not exist.") 
             : Result<string>.Success("Cart deleted successfully.");
     }
+    
+    public async Task<Result<ShoppingCartViewModel>> DeleteItemInCartAsync(
+        Guid cartId,
+        Guid productId)
+    {
+        // Check the cart is paid
+        var isPaid = await _shoppingCartService.IsCartPaidAsync(cartId);
+        if (isPaid is true)
+            return Result<ShoppingCartViewModel>.Failure("Sorry, but you cannot delete the item in a paid cart.");
+
+        // Delete item in cart
+        var deleteResult = await _shoppingCartService.DeleteItemInCartAsync(
+            _userAccessor.GetUserId(), cartId, productId);
+        
+        // Get the updated cart
+        var latestCart = await _shoppingCartService.GetAsync(_userAccessor.GetUserId(), cartId, CancellationToken.None);
+
+        if (latestCart is null)
+            return Result<ShoppingCartViewModel>.Failure("It seems you have no cart.");
+        
+        // Generate and return the updated CartViewModel
+        var updatedCartViewModel = _shoppingCartService.ToViewModel(latestCart);
+        
+        return !deleteResult 
+            ? Result<ShoppingCartViewModel>.Failure("We could not find the item in the cart. It's either deleted or does not exist.") 
+            : Result<ShoppingCartViewModel>.Success(updatedCartViewModel);
+    }
 }

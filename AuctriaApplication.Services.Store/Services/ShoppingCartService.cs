@@ -174,6 +174,27 @@ public class ShoppingCartService : IShoppingCartService
         return true;
     }
     
+    public async Task<bool> DeleteItemInCartAsync(
+        Guid userId,
+        Guid cartId, 
+        Guid productId)
+    {
+        await using var dbContext = await _context.CreateDbContextAsync();
+        var productCart = await dbContext.ProductCarts
+            .Include(pc => pc.Cart)
+            .FirstOrDefaultAsync(pc => 
+                pc.CartId == cartId && 
+                pc.ProductId == productId && 
+                pc.Cart.UserId == userId);
+
+        if (productCart == null) 
+            return false;
+        
+        dbContext.ProductCarts.Remove(productCart);
+        await dbContext.SaveChangesAsync();
+        return true;
+    }
+    
     public ShoppingCartViewModel ToViewModel(Cart cart)
     {
         return new ShoppingCartViewModel
@@ -185,7 +206,7 @@ public class ShoppingCartService : IShoppingCartService
                 .ToString("G")),
             Products = cart.ProductCarts.Select(pc => new ProductCartItemViewModel
             {
-                ProductId = pc.Id,
+                ProductId = pc.ProductId,
                 Name = pc.Product.Name,
                 ImageUrl = pc.Product.ImageUrl ?? string.Empty,
                 Price = pc.Product.Price,
