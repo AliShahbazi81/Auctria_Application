@@ -1,4 +1,5 @@
-﻿using AuctriaApplication.Infrastructure.Payment.Guard;
+﻿using AuctriaApplication.Domain.Enums;
+using AuctriaApplication.Infrastructure.Payment.Guard;
 using AuctriaApplication.Infrastructure.Payment.Services.Abstract;
 using AuctriaApplication.Infrastructure.Results;
 using AuctriaApplication.Infrastructure.Services;
@@ -61,20 +62,25 @@ public class PaymentManager : IPaymentManager
         // Check if user already paid the payment
         if (await _paymentService.IsPaidAsync(shoppingCartId))
             return Result<string>.Failure("You have already paid the payment for the items!");
-
-        // Check for quantity of items and reduce them
-        var (areItemsReduced, lowQuantityProducts) = await _shoppingCartService.AreItemsReducedAsync(shoppingCartId);
-        if (!areItemsReduced)
-            return Result<string>.Failure("Sorry, but it seems like we faced an issue while reducing the items.");
-
+        
         // Get the total amount of the shopping cart
         var cost = await _shoppingCartService.GetCostAsync(shoppingCartId);
 
         // Process the payment
         var isPaid = await _paymentService.PayAsync(shoppingCartId, cardDto, cost);
         if (!isPaid)
+        {
+            // Set the payment status to failed
+            await _paymentService.SetPaymentStatusAsync(shoppingCartId, PaymentStatus.Failed);
+            
             return Result<string>.Failure("Sorry, but it seems we faced an issue while processing the payment");
+        }
 
+        // Check for quantity of items and reduce them
+        var (areItemsReduced, lowQuantityProducts) = await _shoppingCartService.AreItemsReducedAsync(shoppingCartId);
+        if (!areItemsReduced)
+            return Result<string>.Failure("Sorry, but it seems like we faced an issue while reducing the items.");
+        
         // Inform user via email
         await _emailService.SendEmailAsync(
             _userAccessor.GetUserEmail(),

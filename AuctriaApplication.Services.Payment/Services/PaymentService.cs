@@ -1,5 +1,6 @@
 ﻿using AuctriaApplication.DataAccess.DbContext;
 using AuctriaApplication.Domain.Enums;
+using AuctriaApplication.Domain.Exceptions;
 using AuctriaApplication.Domain.Helper;
 using AuctriaApplication.Services.Payment.Dto;
 using AuctriaApplication.Services.Payment.Exceptions;
@@ -99,6 +100,25 @@ public class PaymentService : IPaymentService
             await transaction.RollbackAsync();
             throw new PaymentFailedException(e.ToString());
         }
+    }
+    
+    public async Task<bool> SetPaymentStatusAsync(
+        Guid shoppingCartId,
+        PaymentStatus paymentStatus)
+    {
+        await using var dbContext = await _context.CreateDbContextAsync();
+
+        var payment = await dbContext.Payments
+            .SingleAsync(x => x.ShoppingCartId == shoppingCartId);
+
+        payment.PaymentStatus = paymentStatus;
+
+        var isSaved = await dbContext.SaveChangesAsync() > 0;
+
+        if (!isSaved)
+            throw new NotSavedException(false);
+
+        return true;
     }
 
     public async Task<bool> IsPaidAsync(Guid shoppingCartId)

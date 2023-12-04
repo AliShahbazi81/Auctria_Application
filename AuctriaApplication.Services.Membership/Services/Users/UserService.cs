@@ -1,10 +1,10 @@
 ﻿using System.Linq.Expressions;
 using AuctriaApplication.DataAccess.DbContext;
 using AuctriaApplication.DataAccess.Entities.Users;
+using AuctriaApplication.Domain.Exceptions;
 using AuctriaApplication.Domain.Helper;
 using AuctriaApplication.Domain.Variables;
 using AuctriaApplication.Services.Membership.Dto;
-using AuctriaApplication.Services.Membership.Exceptions;
 using AuctriaApplication.Services.Membership.Services.Token;
 using AuctriaApplication.Services.Membership.Services.Users.Abstract;
 using Microsoft.AspNetCore.Identity;

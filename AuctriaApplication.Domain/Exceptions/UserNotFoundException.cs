@@ -1,4 +1,4 @@
-﻿namespace AuctriaApplication.Services.Membership.Exceptions;
+﻿namespace AuctriaApplication.Domain.Exceptions;
 
 public class UserNotFoundException : Exception
 {

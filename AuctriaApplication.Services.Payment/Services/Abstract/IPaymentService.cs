@@ -1,4 +1,5 @@
-﻿using AuctriaApplication.Services.Payment.Dto;
+﻿using AuctriaApplication.Domain.Enums;
+using AuctriaApplication.Services.Payment.Dto;
 
 namespace AuctriaApplication.Services.Payment.Services.Abstract;
 
@@ -18,6 +19,10 @@ public interface IPaymentService
         Guid shoppingCardId,
         UserCardInfoDto cardDto,
         decimal cost);
+
+    Task<bool> SetPaymentStatusAsync(
+        Guid shoppingCartId,
+        PaymentStatus paymentStatus);
 
     /// <summary>
     /// Asynchronously checks if a shopping cart has been paid for.

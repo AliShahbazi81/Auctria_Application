@@ -18,7 +18,7 @@ public class PaymentController : BaseApiController
         _logger = logger;
     }
 
-    [HttpPost("Payment")]
+    [HttpPost("Pay")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

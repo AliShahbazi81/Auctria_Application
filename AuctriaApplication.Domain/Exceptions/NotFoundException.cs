@@ -1,4 +1,4 @@
-﻿namespace AuctriaApplication.Services.Store.Exceptions;
+﻿namespace AuctriaApplication.Domain.Exceptions;
 
 public class NotFoundException : Exception
 {

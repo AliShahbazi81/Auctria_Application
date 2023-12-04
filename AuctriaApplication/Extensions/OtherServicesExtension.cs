@@ -37,10 +37,12 @@ public static class OtherServicesExtension
         services.AddScoped<IEmailService, EmailService>();
         // SMS
         services.AddScoped<ISmsService, SmsService>();
-        
-        //Payment
         services.Configure<SmsConfiguration>(config.GetSection("Twilio"));
         services.AddSingleton(x => x.GetRequiredService<IOptions<SmsConfiguration>>().Value);
+        
+        //Payment
+        services.Configure<PaymentConfig>(config.GetSection("Stripe"));
+        services.AddSingleton(x => x.GetRequiredService<IOptions<PaymentConfig>>().Value);
         services.AddScoped<IPaymentService, PaymentService>();
         
         // Store
