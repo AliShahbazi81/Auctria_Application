@@ -38,6 +38,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctriaApplication.Services
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctriaApplication.Services.Redis", "AuctriaApplication.Services.Redis\AuctriaApplication.Services.Redis.csproj", "{A3854249-9018-4336-A6DC-9CECDF0CF08E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuctriaApplication.Tests.Store", "AuctriaApplication.Tests.Store\AuctriaApplication.Tests.Store.csproj", "{BEA38F47-7477-4F11-9869-68F451FC1FA5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -100,6 +102,10 @@ Global
 		{A3854249-9018-4336-A6DC-9CECDF0CF08E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A3854249-9018-4336-A6DC-9CECDF0CF08E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A3854249-9018-4336-A6DC-9CECDF0CF08E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEA38F47-7477-4F11-9869-68F451FC1FA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEA38F47-7477-4F11-9869-68F451FC1FA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEA38F47-7477-4F11-9869-68F451FC1FA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEA38F47-7477-4F11-9869-68F451FC1FA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AB64D67E-6679-4D1A-9EAB-032BAFEBE21F} = {40CA0103-3650-4EB7-989F-927C64A0F079}
@@ -116,5 +122,6 @@ Global
 		{4F333682-3A7B-449B-9FCB-885825685EDB} = {039D9ED7-92AC-4461-A1FF-F0FC8A6CF402}
 		{1BA968D7-B64E-4954-90DB-AF501CE85240} = {F0506B47-80FE-4232-B5BE-358632F331FE}
 		{A3854249-9018-4336-A6DC-9CECDF0CF08E} = {F0506B47-80FE-4232-B5BE-358632F331FE}
+		{BEA38F47-7477-4F11-9869-68F451FC1FA5} = {0A97CD88-43FE-4B22-9F53-8F414DEDD819}
 	EndGlobalSection
 EndGlobal
