@@ -85,7 +85,7 @@ public class ShoppingCartService : IShoppingCartService
         CancellationToken cancellationToken)
     {
         await using var dbContext = await _context.CreateDbContextAsync(cancellationToken);
-    
+
         var productCart = await dbContext.ProductCarts
             .FirstOrDefaultAsync(pc => 
                     pc.CartId == cartId && 
@@ -107,15 +107,22 @@ public class ShoppingCartService : IShoppingCartService
         else
         {
             if (quantity > 0)
+            {
                 productCart.Quantity = quantity;
+            }
             else
             {
                 // Remove the product from the cart if quantity is 0
                 dbContext.ProductCarts.Remove(productCart);
+                
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+
+                // Check if the cart is empty and remove it if necessary
+                await CheckAndRemoveEmptyCartAsync(cartId);
             }
         }
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await dbContext.SaveChangesAsync(CancellationToken.None);
         return true;
     }
     
@@ -302,5 +309,22 @@ public class ShoppingCartService : IShoppingCartService
             .ToListAsync();
 
         return shoppingCartItems;
+    }
+    
+    private async Task CheckAndRemoveEmptyCartAsync(Guid cartId)
+    {
+        await using var dbContext = await _context.CreateDbContextAsync();
+        
+        // Check if the cart has any other items left
+        if (!await dbContext.ProductCarts.AnyAsync(pc => pc.CartId == cartId))
+        {
+            // If not, remove the cart as well
+            var cart = await dbContext.Carts.FindAsync(cartId);
+            if (cart != null)
+            {
+                dbContext.Carts.Remove(cart);
+                await dbContext.SaveChangesAsync(CancellationToken.None);
+            }
+        }
     }
 }

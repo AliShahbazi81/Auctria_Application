@@ -1,5 +1,6 @@
 ﻿using AuctriaApplication.Infrastructure.Results;
 using AuctriaApplication.Infrastructure.Services.Abstract;
+using AuctriaApplication.Infrastructure.Store.Guards;
 using AuctriaApplication.Infrastructure.Store.Services.Abstract;
 using AuctriaApplication.Services.Membership.Services.Users.Abstract;
 using AuctriaApplication.Services.Store.Dto.ViewModel;
@@ -64,19 +65,23 @@ public class ShoppingCartManager : IShoppingCartManager
         return Result<IEnumerable<ShoppingCartViewModel>>.Success(carts);
     }
 
-    public async Task<Result<ShoppingCartViewModel>> AddProductToCartAsync(
+    public async Task<Result<ShoppingCartViewModel?>> AddProductToCartAsync(
         Guid productId,
         int quantity,
         CancellationToken cancellationToken)
     {
+        // Check if quantity is valid
+        if(!GeneralGuards.IsNumberMoreThanZero(quantity))
+            return Result<ShoppingCartViewModel?>.Failure("Sorry, but the quantity of the product should be zero or more.");
+        
         // Check if user is locked or has any restrictions
         if (await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))
-            return Result<ShoppingCartViewModel>.Failure("User account is locked.");
+            return Result<ShoppingCartViewModel?>.Failure("User account is locked.");
 
         // Check if the product exists and available
         var product = await _productService.GetProductByIdAsync(productId);
         if (product.Quantity < quantity)
-            return Result<ShoppingCartViewModel>.Failure("Sorry, but the number of item you selected is not currently in stock.");
+            return Result<ShoppingCartViewModel?>.Failure("Sorry, but the number of item you selected is not currently in stock.");
 
         // Get or create cart
         var cart = await _shoppingCartService.GetCartForUserAsync(_userAccessor.GetUserId(), cancellationToken) ??
@@ -87,7 +92,7 @@ public class ShoppingCartManager : IShoppingCartManager
             cart.Id, productId, quantity, cancellationToken);
 
         if (!productCartUpdateResult)
-            return Result<ShoppingCartViewModel>.Failure("Failed to update the cart.");
+            return Result<ShoppingCartViewModel?>.Failure("Failed to update the cart.");
 
         // Calculate the total price of the cart
         await _shoppingCartService.UpdateCartTotalAsync(cart.Id, cancellationToken);
@@ -96,12 +101,12 @@ public class ShoppingCartManager : IShoppingCartManager
         var latestCart = await _shoppingCartService.GetAsync(_userAccessor.GetUserId(), cart.Id, cancellationToken);
 
         if (latestCart is null)
-            return Result<ShoppingCartViewModel>.Failure("It seems we faced a problem retrieving the cart.");
+            return Result<ShoppingCartViewModel?>.Success(null);
 
         // Generate and return the updated CartViewModel
         var updatedCartViewModel = _shoppingCartService.ToViewModel(latestCart);
 
-        return Result<ShoppingCartViewModel>.Success(updatedCartViewModel);
+        return Result<ShoppingCartViewModel?>.Success(updatedCartViewModel);
     }
 
     public async Task<Result<string>> DeleteCartAsync(Guid cartId)
@@ -123,14 +128,14 @@ public class ShoppingCartManager : IShoppingCartManager
             : Result<string>.Success("Cart deleted successfully.");
     }
     
-    public async Task<Result<ShoppingCartViewModel>> DeleteItemInCartAsync(
+    public async Task<Result<ShoppingCartViewModel?>> DeleteItemInCartAsync(
         Guid cartId,
         Guid productId)
     {
         // Check the cart is paid
         var isPaid = await _shoppingCartService.IsCartPaidAsync(cartId);
         if (isPaid is true)
-            return Result<ShoppingCartViewModel>.Failure("Sorry, but you cannot delete the item in a paid cart.");
+            return Result<ShoppingCartViewModel?>.Failure("Sorry, but you cannot delete the item in a paid cart.");
 
         // Delete item in cart
         var deleteResult = await _shoppingCartService.DeleteItemInCartAsync(
@@ -143,13 +148,13 @@ public class ShoppingCartManager : IShoppingCartManager
         var latestCart = await _shoppingCartService.GetAsync(_userAccessor.GetUserId(), cartId, CancellationToken.None);
 
         if (latestCart is null)
-            return Result<ShoppingCartViewModel>.Failure("It seems you have no cart.");
+            return Result<ShoppingCartViewModel?>.Success(null);
         
         // Generate and return the updated CartViewModel
         var updatedCartViewModel = _shoppingCartService.ToViewModel(latestCart);
         
         return !deleteResult 
-            ? Result<ShoppingCartViewModel>.Failure("We could not find the item in the cart. It's either deleted or does not exist.") 
-            : Result<ShoppingCartViewModel>.Success(updatedCartViewModel);
+            ? Result<ShoppingCartViewModel?>.Failure("We could not find the item in the cart. It's either deleted or does not exist.") 
+            : Result<ShoppingCartViewModel?>.Success(updatedCartViewModel);
     }
 }

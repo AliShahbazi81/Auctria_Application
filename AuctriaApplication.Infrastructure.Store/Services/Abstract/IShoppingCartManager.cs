@@ -25,14 +25,14 @@ public interface IShoppingCartManager
     /// <param name="quantity">The quantity of the product to add.</param>
     /// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the updated shopping cart view model.</returns>
-    Task<Result<ShoppingCartViewModel>> AddProductToCartAsync(
+    Task<Result<ShoppingCartViewModel?>> AddProductToCartAsync(
         Guid productId,
         int quantity,
         CancellationToken cancellationToken);
 
     Task<Result<string>> DeleteCartAsync(Guid cartId);
 
-    Task<Result<ShoppingCartViewModel>> DeleteItemInCartAsync(
+    Task<Result<ShoppingCartViewModel?>> DeleteItemInCartAsync(
         Guid cartId,
         Guid productId);
 }

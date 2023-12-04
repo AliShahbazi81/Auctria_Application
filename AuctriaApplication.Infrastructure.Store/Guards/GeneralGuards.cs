@@ -6,4 +6,9 @@ public static class GeneralGuards
     {
         return id is not null || !string.IsNullOrWhiteSpace(name);
     }
+    
+    public static bool IsNumberMoreThanZero(int number)
+    {
+        return number > 0;
+    }
 }
