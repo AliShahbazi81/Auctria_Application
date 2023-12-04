@@ -89,7 +89,7 @@ public class ShoppingCartManager : IShoppingCartManager
         if (!productCartUpdateResult)
             return Result<ShoppingCartViewModel>.Failure("Failed to update the cart.");
 
-        // Optionally update the cart total or any other relevant fields
+        // Calculate the total price of the cart
         await _shoppingCartService.UpdateCartTotalAsync(cart.Id, cancellationToken);
         
         // Get the updated cart
@@ -135,6 +135,9 @@ public class ShoppingCartManager : IShoppingCartManager
         // Delete item in cart
         var deleteResult = await _shoppingCartService.DeleteItemInCartAsync(
             _userAccessor.GetUserId(), cartId, productId);
+        
+        // Calculate the total price of the cart
+        await _shoppingCartService.UpdateCartTotalAsync(cartId, CancellationToken.None);
         
         // Get the updated cart
         var latestCart = await _shoppingCartService.GetAsync(_userAccessor.GetUserId(), cartId, CancellationToken.None);
