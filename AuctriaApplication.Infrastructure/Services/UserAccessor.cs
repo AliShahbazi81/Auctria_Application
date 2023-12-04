@@ -15,7 +15,7 @@ public class UserAccessor : IUserAccessor
     
     public Guid GetUserId()
     {
-        return Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty);
+        return Guid.Parse(_httpContextAccessor.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
     }
     
     public string GetUserEmail()

@@ -4,7 +4,6 @@ using AuctriaApplication.Domain.Variables;
 using AuctriaApplication.Infrastructure.Membership.Guards;
 using AuctriaApplication.Infrastructure.Membership.Services.Abstract;
 using AuctriaApplication.Infrastructure.Results;
-using AuctriaApplication.Infrastructure.Services;
 using AuctriaApplication.Infrastructure.Services.Abstract;
 using AuctriaApplication.Services.Membership.Dto;
 using AuctriaApplication.Services.Membership.Dto.ViewModel;
@@ -40,12 +39,12 @@ public class UserManager : IUserManager
     public async Task<Result<List<UsersViewModel>>> GetUsersListAsync()
     {
         // Check if user is locked
-        if (await _userService.IsUserLockedAsync())
-            return Result<List<AuctriaApplication.Services.Membership.Dto.ViewModel.UsersViewModel>>.Failure("User is locked");
+        if (await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))
+            return Result<List<UsersViewModel>>.Failure("User is locked");
 
         var users = await _userService.GetListAsync();
 
-        return Result<List<AuctriaApplication.Services.Membership.Dto.ViewModel.UsersViewModel>>.Success(users);
+        return Result<List<UsersViewModel>>.Success(users);
     }
 
     public async Task<Result<UserViewModel>> GetCurrentUserAsync()
@@ -68,10 +67,6 @@ public class UserManager : IUserManager
 
     public async Task<Result<UserViewModel>> LoginAsync(LoginDto loginDto)
     {
-        // Check if user is locked
-        if(await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))
-            return Result<UserViewModel>.Failure("Sorry, but your account is locked");
-        
         var loggedInUserDto = await _userService.LoginAsync(loginDto);
 
         return Result<UserViewModel>.Success(loggedInUserDto);
@@ -99,7 +94,7 @@ public class UserManager : IUserManager
 
     public async Task<Result<string>> VerifyEmailAsync(string code)
     {
-        if (UserManagerGuard.IsCodeValid(code))
+        if (!UserManagerGuard.IsCodeValid(code))
             return Result<string>.Failure("The entered code is incorrect");
 
         var verification = await _userService.VerifyEmailAsync(_userAccessor.GetUserId(), (int)ValidationTypes.Email, code);
@@ -112,7 +107,7 @@ public class UserManager : IUserManager
     public async Task<Result<string>> SendSmsVerificationAsync(string userPhone)
     {
         // Check if phone number is valid
-        if (!PhoneValidationService.IsPhoneNumberValid(userPhone))
+        if (!PhoneValidationService.IsPhoneNumberValid("+" + userPhone))
             return Result<string>.Failure("Sorry, but it seems the phone number you entered is not valid");
 
         // Check if user has already verified their Phone Number already
@@ -138,12 +133,16 @@ public class UserManager : IUserManager
 
     public async Task<Result<string>> VerifyPhoneAsync(string userCode)
     {
-        if (UserManagerGuard.IsCodeValid(userCode))
+        // Check if user has already verified their Phone Number already
+        if (await _userService.IsFieldVerifiedAsync(_userAccessor.GetUserId(), SharedUserFieldsVar.PhoneNumberConfirmed))
+            return Result<string>.Failure("Your Phone number has ben verified already!");
+        
+        if (!UserManagerGuard.IsCodeValid(userCode))
             return Result<string>.Failure("Please enter the verification code!");
 
         var verification = await _userService.VerifyPhoneAsync(
             _userAccessor.GetUserId(),
-            (int)ValidationTypes.Email,
+            (int)ValidationTypes.Sms,
             userCode);
 
         return !verification.Item1

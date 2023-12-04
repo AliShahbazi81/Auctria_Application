@@ -94,21 +94,18 @@ public static class DbInitializer
         {
             new User
             {
-                Id = Guid.NewGuid(),
                 Name = "Admin",
                 UserName = "Admin",
                 Email = "admin@test.com"
             },
             new User
             {
-                Id = Guid.NewGuid(),
                 Name = "Member",
                 UserName = "Member",
                 Email = "Member@test.com"
             },
             new User
             {
-                Id = Guid.NewGuid(),
                 Name = "Ali",
                 Surname = "Shahbazi",
                 UserName = "VorTex",
@@ -160,12 +157,13 @@ public static class DbInitializer
 
     private static async Task SeedCategories(ApplicationDbContext dbContext)
     {
+        if (await dbContext.Categories.AnyAsync())
+            return;
         // Seed categories
         var categories = new List<Category>
         {
             new Category
             {
-                Id = Guid.NewGuid(),
                 Name = "Electronics",
                 Description = "Electronics",
                 CreatedAt = DateTime.UtcNow,
@@ -173,7 +171,6 @@ public static class DbInitializer
             },
             new Category
             {
-                Id = Guid.NewGuid(),
                 Name = "Clothing",
                 Description = "Clothing",
                 CreatedAt = DateTime.UtcNow,
@@ -181,7 +178,6 @@ public static class DbInitializer
             },
             new Category
             {
-                Id = Guid.NewGuid(),
                 Name = "Home",
                 Description = "Home",
                 CreatedAt = DateTime.UtcNow,
@@ -189,7 +185,6 @@ public static class DbInitializer
             },
             new Category
             {
-                Id = Guid.NewGuid(),
                 Name = "Sports",
                 Description = "Sports",
                 CreatedAt = DateTime.UtcNow,
@@ -197,14 +192,12 @@ public static class DbInitializer
             },
             new Category
             {
-                Id = Guid.NewGuid(),
                 Name = "Toys",
                 Description = "Toys",
                 UserId = (await dbContext.Users.SingleAsync(x => x.Email == _superAdminEmail)).Id
             },
             new Category
             {
-                Id = Guid.NewGuid(),
                 Name = "Books",
                 Description = "Books",
                 CreatedAt = DateTime.UtcNow,
@@ -212,7 +205,6 @@ public static class DbInitializer
             },
             new Category
             {
-                Id = Guid.NewGuid(),
                 Name = "Other",
                 Description = "Other",
                 CreatedAt = DateTime.UtcNow,
@@ -226,12 +218,13 @@ public static class DbInitializer
 
     private static async Task SeedProducts(ApplicationDbContext dbContext)
     {
+        if (await dbContext.Products.AnyAsync())
+            return;
         // Seed products
         var products = new List<Product>
         {
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 12 Pro Max",
                 Description = "Apple iPhone 12 Pro Max",
                 Price = 1099.99m,
@@ -242,7 +235,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 12 Pro",
                 Description = "Apple iPhone 12 Pro",
                 Price = 999.99m,
@@ -253,7 +245,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 12",
                 Description = "Apple iPhone 12",
                 Price = 799.99m,
@@ -264,7 +255,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 11 Pro Max",
                 Description = "Apple iPhone 11 Pro Max",
                 Price = 899.99m,
@@ -275,7 +265,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 11 Pro",
                 Description = "Apple iPhone 11 Pro",
                 Price = 799.99m,
@@ -286,7 +275,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 11",
                 Description = "Apple iPhone 11",
                 Price = 699.99m,
@@ -297,7 +285,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Apple iPhone X",
                 Description = "Apple iPhone X",
                 Price = 599.99m,
@@ -308,7 +295,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 8",
                 Description = "Apple iPhone 8",
                 Price = 499.99m,
@@ -319,7 +305,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 7",
                 Description = "Apple iPhone 7",
                 Price = 399.99m,
@@ -330,7 +315,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 6",
                 Description = "Apple iPhone 6",
                 Price = 299.99m,
@@ -341,7 +325,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 5",
                 Description = "Apple iPhone 5",
                 Price = 199.99m,
@@ -352,7 +335,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Apple iPhone 4",
                 Description = "Apple iPhone 4",
                 Price = 99.99m,
@@ -364,7 +346,6 @@ public static class DbInitializer
             // Clothing
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Nike Air Max 270",
                 Description = "Nike Air Max 270",
                 Price = 149.99m,
@@ -375,7 +356,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Nike Air Max 720",
                 Description = "Nike Air Max 720",
                 Price = 199.99m,
@@ -386,7 +366,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Nike Air Max 90",
                 Description = "Nike Air Max 90",
                 Price = 99.99m,
@@ -397,7 +376,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Nike Air Max 95",
                 Description = "Nike Air Max 95",
                 Price = 129.99m,
@@ -408,7 +386,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Nike Air Max 97",
                 Description = "Nike Air Max 97",
                 Price = 149.99m,
@@ -420,7 +397,6 @@ public static class DbInitializer
             // Home
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Dyson V11",
                 Description = "Dyson V11",
                 Price = 599.99m,
@@ -431,7 +407,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Dyson V10",
                 Description = "Dyson V10",
                 Price = 499.99m,
@@ -443,7 +418,6 @@ public static class DbInitializer
             // Toys
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Lego Star Wars",
                 Description = "Lego Star Wars",
                 Price = 99.99m,
@@ -455,7 +429,6 @@ public static class DbInitializer
             // Books
             new Product
             {
-                Id = Guid.NewGuid(),
                 Name = "Harry Potter",
                 Description = "Harry Potter",
                 Price = 19.99m,
@@ -466,7 +439,6 @@ public static class DbInitializer
             },
             new Product
             {
-                Id = Guid.NewGuid(),
                 Name = "Harry Potter 2",
                 Description = "Harry Potter 2",
                 Price = 19.99m,
@@ -477,7 +449,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Harry Potter 3",
                 Description = "Harry Potter 3",
                 Price = 19.99m,
@@ -488,7 +459,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Harry Potter 4",
                 Description = "Harry Potter 4",
                 Price = 19.99m,
@@ -499,7 +469,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Harry Potter 5",
                 Description = "Harry Potter 5",
                 Price = 19.99m,
@@ -510,7 +479,6 @@ public static class DbInitializer
             },
             new()
             {
-                Id = Guid.NewGuid(),
                 Name = "Harry Potter 6",
                 Description = "Harry Potter 6",
                 Price = 19.99m,

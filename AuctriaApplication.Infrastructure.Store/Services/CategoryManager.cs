@@ -76,6 +76,7 @@ public class CategoryManager : ICategoryManager
     }
 
     public async Task<Result<CategoryViewModel>> UpdateCategoryAsync(
+        Guid categoryId,
         CategoryDto updatedDto, 
         CancellationToken cancellationToken)
     {
@@ -88,7 +89,7 @@ public class CategoryManager : ICategoryManager
             return Result<CategoryViewModel>.Failure("It seems we already have a category with the same name in the system.");
         
         // Create the category
-        var category = await _categoryService.UpdateAsync(_userAccessor.GetUserId(), updatedDto, cancellationToken);
+        var category = await _categoryService.UpdateAsync(categoryId, updatedDto, cancellationToken);
         
         return Result<CategoryViewModel>.Success(category);
     }

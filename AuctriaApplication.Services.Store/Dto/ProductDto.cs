@@ -2,7 +2,7 @@
 
 namespace AuctriaApplication.Services.Store.Dto;
 
-public abstract record ProductDto : BaseProductDto
+public record ProductDto : BaseProductDto
 {
     public required double Price { get; set; }
 }

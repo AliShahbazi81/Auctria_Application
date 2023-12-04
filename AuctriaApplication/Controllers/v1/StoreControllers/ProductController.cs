@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata;
-using AuctriaApplication.Infrastructure.Store.Services.Abstract;
-using AuctriaApplication.Services.Store.Dto;
+﻿using AuctriaApplication.Infrastructure.Store.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Auctria_Application.Controllers.v1.StoreControllers;
@@ -11,7 +9,7 @@ public class ProductController : BaseApiController
     private readonly ILogger<ProductController> _logger;
 
     public ProductController(
-        IProductManager productManager, 
+        IProductManager productManager,
         ILogger<ProductController> logger)
     {
         _productManager = productManager;
@@ -39,11 +37,27 @@ public class ProductController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetProducts(ProductFilterDto filterDto, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetProducts(
+        CancellationToken cancellationToken,
+        [FromQuery] string? productName = null,
+        [FromQuery] string? categoryName = null,
+        [FromQuery] double? minPrice = null,
+        [FromQuery] double? maxPrice = null,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 20,
+        [FromQuery] bool isDeleted = false)
     {
         try
         {
-            return HandleResult(await _productManager.GetProductsListAsync(cancellationToken, filterDto));
+            return HandleResult(await _productManager.GetProductsListAsync(
+                cancellationToken,
+                productName,
+                categoryName,
+                minPrice,
+                maxPrice,
+                pageNumber,
+                pageSize,
+                isDeleted));
         }
         catch (Exception e)
         {
@@ -51,5 +65,4 @@ public class ProductController : BaseApiController
             throw;
         }
     }
-    
 }

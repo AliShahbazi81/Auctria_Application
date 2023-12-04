@@ -19,12 +19,12 @@ public class ProductController : BaseAdminController
         _logger = logger;
     }
 
-    [HttpPost("CreateProduct")]
+    [HttpPost("Create")]
     [RequiredPermission(PermissionAction.Product_Create)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> CreateProduct(Guid categoryId, ProductDto productDto, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create(Guid categoryId, ProductDto productDto, CancellationToken cancellationToken)
     {
         try
         {
@@ -37,12 +37,12 @@ public class ProductController : BaseAdminController
         }
     }
 
-    [HttpPut("UpdateProduct")]
+    [HttpPut("Update")]
     [RequiredPermission(PermissionAction.Product_Update)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> UpdateProduct(Guid productId, ProductDto productDto, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update(Guid productId, ProductDto productDto, CancellationToken cancellationToken)
     {
         try
         {
@@ -55,12 +55,12 @@ public class ProductController : BaseAdminController
         }
     }
 
-    [HttpDelete("DeleteProduct")]
+    [HttpDelete("Delete")]
     [RequiredPermission(PermissionAction.Product_Delete)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> DeleteProduct(Guid productId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete(Guid productId, CancellationToken cancellationToken)
     {
         try
         {

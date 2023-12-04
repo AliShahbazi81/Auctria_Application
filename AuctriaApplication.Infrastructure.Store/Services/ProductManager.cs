@@ -1,5 +1,4 @@
 ﻿using AuctriaApplication.Infrastructure.Results;
-using AuctriaApplication.Infrastructure.Services;
 using AuctriaApplication.Infrastructure.Services.Abstract;
 using AuctriaApplication.Infrastructure.Store.Guards;
 using AuctriaApplication.Infrastructure.Store.Services.Abstract;
@@ -29,34 +28,48 @@ public class ProductManager : IProductManager
         _categoryService = categoryService;
     }
 
-    public async Task<Result<ProductViewModel>> GetProductAsync(
+    public async Task<Result<IEnumerable<ProductViewModel>>> GetProductAsync(
         Guid? productId, 
         string? productName, 
         CancellationToken cancellationToken)
     {
         // Check if both of the inputs are null
         if (!GeneralGuards.AreInputsNull(productId, productName))
-            return Result<ProductViewModel>.Failure("Sorry but you have to enter either id or name for getting a product!");
+            return Result<IEnumerable<ProductViewModel>>.Failure("Sorry but you have to enter either id or name for getting a product!");
         
         // Check if user is locked
         if (await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))
-            return Result<ProductViewModel>.Failure("Sorry, but your account is locked.");
+            return Result<IEnumerable<ProductViewModel>>.Failure("Sorry, but your account is locked.");
         
         var product = await _productService.GetAsync(cancellationToken, productId, productName);
         
-        return Result<ProductViewModel>.Success(product);
+        return Result<IEnumerable<ProductViewModel>>.Success(product);
     }
 
     public async Task<Result<IEnumerable<ProductViewModel>>> GetProductsListAsync(
         CancellationToken cancellationToken,
-        ProductFilterDto filterDto)
+        string? productName = null,
+        string? categoryName = null,
+        double? minPrice = null,
+        double? maxPrice = null,
+        int pageNumber = 1,
+        int pageSize = 20,
+        bool isDeleted = false)
     {
         // Check if user is locked
         if (await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))
             return Result<IEnumerable<ProductViewModel>>.Failure("Sorry, but your account is locked.");
         
         // Get the list of Products
-        var products = await _productService.GetListAsync(cancellationToken, filterDto);
+        var products = await _productService.GetListAsync(
+            cancellationToken, 
+            productName, 
+            categoryName, 
+            minPrice, 
+            maxPrice, 
+            pageNumber, 
+            pageSize, 
+            isDeleted);
         
         return Result<IEnumerable<ProductViewModel>>.Success(products);
     }

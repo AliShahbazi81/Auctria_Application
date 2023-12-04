@@ -44,11 +44,13 @@ public interface ICategoryManager
     /// <summary>
     /// Asynchronously updates an existing category.
     /// </summary>
+    /// <param name="categoryId">The unique identifier for the category.</param>
     /// <param name="updatedDto">The updated category data.</param>
     /// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the updated category view model.</returns>
     Task<Result<CategoryViewModel>> UpdateCategoryAsync(
-        CategoryDto updatedDto,
+        Guid categoryId,
+        CategoryDto updatedDto, 
         CancellationToken cancellationToken);
 
     /// <summary>

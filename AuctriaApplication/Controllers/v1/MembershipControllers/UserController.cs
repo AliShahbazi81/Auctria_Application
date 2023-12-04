@@ -35,7 +35,7 @@ public class UserController : BaseApiController
         }
     }
     
-    [HttpGet("Login")]
+    [HttpPost("Login")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

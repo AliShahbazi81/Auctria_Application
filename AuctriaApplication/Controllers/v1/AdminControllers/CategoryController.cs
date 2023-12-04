@@ -19,12 +19,12 @@ public class CategoryController : BaseAdminController
         _logger = logger;
     }
 
-    [HttpPost("CreateCategory")]
+    [HttpPost("Create")]
     [RequiredPermission(PermissionAction.Category_Create)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> CreateCategory(
+    public async Task<IActionResult> Create(
         CategoryDto categoryDto, 
         CancellationToken cancellationToken)
     {
@@ -39,16 +39,16 @@ public class CategoryController : BaseAdminController
         }
     }
 
-    [HttpPut("UpdateCategory")]
+    [HttpPut("Update")]
     [RequiredPermission(PermissionAction.Category_Update)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> UpdateCategory(CategoryDto updatedDto, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update(Guid categoryId, CategoryDto updatedDto, CancellationToken cancellationToken)
     {
         try
         {
-            return HandleResult(await _categoryManager.UpdateCategoryAsync(updatedDto, cancellationToken));
+            return HandleResult(await _categoryManager.UpdateCategoryAsync(categoryId, updatedDto, cancellationToken));
         }
         catch (Exception e)
         {
@@ -57,12 +57,12 @@ public class CategoryController : BaseAdminController
         }
     }
 
-    [HttpDelete("DeleteCategory")]
+    [HttpDelete("Delete")]
     [RequiredPermission(PermissionAction.Category_Delete)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> DeleteCategory(Guid categoryId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete(Guid categoryId, CancellationToken cancellationToken)
     {
         try
         {

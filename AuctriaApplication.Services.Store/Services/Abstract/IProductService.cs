@@ -16,7 +16,7 @@ public interface IProductService
     /// <param name="productId">The unique identifier for the product. Optional.</param>
     /// <param name="productName">The name of the product. Optional.</param>
     /// <returns>The product model if found; otherwise, throws NotFoundException.</returns>
-    Task<ProductViewModel> GetAsync(
+    Task<IEnumerable<ProductViewModel>> GetAsync(
         CancellationToken cancellationToken,
         Guid? productId = null,
         string? productName = null);
@@ -31,7 +31,13 @@ public interface IProductService
     /// <returns>A list of product models based on the specified filters.</returns>
     Task<IEnumerable<ProductViewModel>> GetListAsync(
         CancellationToken cancellationToken,
-        ProductFilterDto filterDto);
+        string? productName = null,
+        string? categoryName = null,
+        double? minPrice = null,
+        double? maxPrice = null,
+        int pageNumber = 1,
+        int pageSize = 20,
+        bool isDeleted = false);
     
     /// <summary>
     /// Adds a new product.

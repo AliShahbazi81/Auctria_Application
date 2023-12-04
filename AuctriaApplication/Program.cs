@@ -11,6 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // -------------------------- Register Services --------------------------
 builder.Services.AddDatabaseService(builder.Configuration, useSqlLite: true);
+builder.Services.AddSwaggerService();
 builder.Services.AddAuthenticationService();
 builder.Services.AddIdentityService(builder.Configuration);
 builder.Services.AddOtherServices(builder.Configuration);

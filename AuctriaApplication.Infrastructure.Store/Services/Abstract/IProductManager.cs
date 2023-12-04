@@ -16,9 +16,9 @@ public interface IProductManager
     /// <param name="productName">The name of the product. Optional.</param>
     /// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the product view model if found.</returns>
-    Task<Result<ProductViewModel>> GetProductAsync(
-        Guid? productId,
-        string? productName,
+    Task<Result<IEnumerable<ProductViewModel>>> GetProductAsync(
+        Guid? productId, 
+        string? productName, 
         CancellationToken cancellationToken);
 
     /// <summary>
@@ -29,7 +29,13 @@ public interface IProductManager
     /// <returns>A task that represents the asynchronous operation. The task result contains a list of product view models.</returns>
     Task<Result<IEnumerable<ProductViewModel>>> GetProductsListAsync(
         CancellationToken cancellationToken,
-        ProductFilterDto filterDto);
+        string? productName = null,
+        string? categoryName = null,
+        double? minPrice = null,
+        double? maxPrice = null,
+        int pageNumber = 1,
+        int pageSize = 20,
+        bool isDeleted = false);
     
     /// <summary>
     /// Asynchronously adds a new product.
