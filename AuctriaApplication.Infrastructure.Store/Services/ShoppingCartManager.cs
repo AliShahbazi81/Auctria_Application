@@ -54,9 +54,12 @@ public class ShoppingCartManager : IShoppingCartManager
 
         // Optionally update the cart total or any other relevant fields
         await _shoppingCartService.UpdateCartTotalAsync(cart.Id, cancellationToken);
+        
+        // Get the updated cart
+        var latestCart = await _shoppingCartService.GetAsync(_userAccessor.GetUserId(), cart.Id, cancellationToken);
 
         // Generate and return the updated CartViewModel
-        var updatedCartViewModel = _shoppingCartService.ToViewModel(cart);
+        var updatedCartViewModel = _shoppingCartService.ToViewModel(latestCart);
 
         return Result<ShoppingCartViewModel>.Success(updatedCartViewModel);
     }

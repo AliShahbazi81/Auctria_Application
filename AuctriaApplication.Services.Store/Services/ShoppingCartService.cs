@@ -17,7 +17,7 @@ public class ShoppingCartService : IShoppingCartService
         _context = context;
     }
 
-    public async Task<ShoppingCartViewModel> GetAsync(
+    public async Task<Cart> GetAsync(
         Guid userId,
         Guid cartId,
         CancellationToken cancellationToken)
@@ -25,6 +25,9 @@ public class ShoppingCartService : IShoppingCartService
         await using var dbContext = await _context.CreateDbContextAsync(cancellationToken);
 
         var cart = await dbContext.Carts
+            .Include(x => x.Payment)
+            .Include(x => x.ProductCarts)
+            .ThenInclude(x => x.Product)
             .AsNoTracking()
             .SingleOrDefaultAsync(x =>
                     x.Id == cartId &&
@@ -34,7 +37,7 @@ public class ShoppingCartService : IShoppingCartService
         if (cart is null)
             throw new NotFoundException();
 
-        return ToViewModel(cart);
+        return cart;
     }
 
     public async Task<decimal> GetCostAsync(Guid shoppingCartId)
@@ -112,11 +115,14 @@ public class ShoppingCartService : IShoppingCartService
         CancellationToken cancellationToken)
     {
         await using var dbContext = await _context.CreateDbContextAsync(cancellationToken);
+        
         var newCart = new Cart
         {
-            UserId = userId,
-            Total = 0
+            Total = 0,
+            CreatedAt = DateTime.UtcNow,
+            UserId = userId
         };
+        
         dbContext.Carts.Add(newCart);
         await dbContext.SaveChangesAsync(cancellationToken);
         return newCart;
@@ -198,9 +204,17 @@ public class ShoppingCartService : IShoppingCartService
         {
             Id = cart.Id,
             Total = cart.Total.ToString("N0"),
-            PaymentStatus = cart.Payment.PaymentStatus.ToString(),
+            PaymentStatus = cart.Payment != null! ? cart.Payment.PaymentStatus.ToString() : PaymentStatus.Pending.ToString(),
             CreatedAt = Convert.ToDateTime(cart.CreatedAt.ToLocalTime()
                 .ToString("G")),
+            Products = cart.ProductCarts.Select(pc => new ProductCartItemViewModel
+            {
+                ProductId = pc.Id,
+                Name = pc.Product.Name,
+                ImageUrl = pc.Product.ImageUrl ?? string.Empty,
+                Price = pc.Product.Price,
+                Quantity = pc.Quantity
+            }).ToList()
         };
     }
 

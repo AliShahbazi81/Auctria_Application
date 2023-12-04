@@ -4,7 +4,7 @@ public record struct ShoppingCartViewModel
 {
     public required Guid Id { get; set; }
     public required string Total { get; set; }
-    public required string PaymentStatus { get; set; }
+    public string PaymentStatus { get; set; }
     public required DateTime CreatedAt{ get; set; }
     public List<ProductCartItemViewModel> Products { get; set; }
 }
