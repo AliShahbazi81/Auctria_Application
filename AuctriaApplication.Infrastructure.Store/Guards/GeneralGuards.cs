@@ -9,6 +9,6 @@ public static class GeneralGuards
     
     public static bool IsNumberMoreThanZero(int number)
     {
-        return number > 0;
+        return number >= 0;
     }
 }

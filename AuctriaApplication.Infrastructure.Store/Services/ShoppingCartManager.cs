@@ -70,6 +70,7 @@ public class ShoppingCartManager : IShoppingCartManager
         int quantity,
         CancellationToken cancellationToken)
     {
+        
         // Check if quantity is valid
         if(!GeneralGuards.IsNumberMoreThanZero(quantity))
             return Result<ShoppingCartViewModel?>.Failure("Sorry, but the quantity of the product should be zero or more.");
@@ -83,9 +84,15 @@ public class ShoppingCartManager : IShoppingCartManager
         if (product.Quantity < quantity)
             return Result<ShoppingCartViewModel?>.Failure("Sorry, but the number of item you selected is not currently in stock.");
 
-        // Get or create cart
-        var cart = await _shoppingCartService.GetCartForUserAsync(_userAccessor.GetUserId(), cancellationToken) ??
-                   await _shoppingCartService.CreateCartForUserAsync(_userAccessor.GetUserId(), cancellationToken);
+        // Get the existing cart, if any
+        var cart = await _shoppingCartService.GetCartForUserAsync(_userAccessor.GetUserId(), cancellationToken);
+
+        // If quantity is 0 and there is no existing cart, return null
+        if (quantity == 0 && cart == null)
+            return Result<ShoppingCartViewModel?>.Failure("Sorry, but the quantity of the selected product should be more than zero!");
+
+        // Create cart if it doesn't exist
+        cart ??= await _shoppingCartService.CreateCartForUserAsync(_userAccessor.GetUserId(), cancellationToken);
 
         // Add or update product in cart
         var productCartUpdateResult = await _shoppingCartService.AddOrUpdateProductInCartAsync(
@@ -96,7 +103,7 @@ public class ShoppingCartManager : IShoppingCartManager
 
         // Calculate the total price of the cart
         await _shoppingCartService.UpdateCartTotalAsync(cart.Id, cancellationToken);
-        
+    
         // Get the updated cart
         var latestCart = await _shoppingCartService.GetAsync(_userAccessor.GetUserId(), cart.Id, cancellationToken);
 
