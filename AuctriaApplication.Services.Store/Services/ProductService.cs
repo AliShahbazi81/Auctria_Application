@@ -28,12 +28,14 @@ public class ProductService : IProductService
         var product = productId is null
             ? await dbContext.Products
                 .AsNoTracking()
-                .Where(x => EF.Functions.Like(x.Name.ToLower().Replace(" ", ""), $"%{productName}%"))
+                .Where(x => 
+                    EF.Functions.Like(x.Name.ToLower().Replace(" ", ""), $"%{productName}%") && 
+                    !x.IsDeleted)
                 .Include(x => x.Category)
                 .ToListAsync(cancellationToken: cancellationToken)
             : await dbContext.Products
                 .AsNoTracking()
-                .Where(x => x.Id == productId)
+                .Where(x => x.Id == productId && !x.IsDeleted)
                 .Include(x => x.Category)
                 .ToListAsync(cancellationToken: cancellationToken);
 
