@@ -26,11 +26,12 @@ public class ShoppingCartController : BaseAdminController
     public async Task<IActionResult> GetUserShoppingCart(
         Guid userId, 
         Guid cartId, 
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        CurrencyTypes currencyType = CurrencyTypes.CAD)
     {
         try
         {
-            return HandleResult(await _shoppingCartManager.GetUserCartAsync(cartId, cancellationToken, userId));
+            return HandleResult(await _shoppingCartManager.GetUserCartAsync(cartId, cancellationToken, userId, currencyType));
         }
         catch (Exception e)
         {
@@ -46,11 +47,12 @@ public class ShoppingCartController : BaseAdminController
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetUserShoppingCarts(
         Guid userId, 
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        CurrencyTypes currencyType = CurrencyTypes.CAD)
     {
         try
         {
-            return HandleResult(await _shoppingCartManager.GetUserCartsAsync(cancellationToken, userId));
+            return HandleResult(await _shoppingCartManager.GetUserCartsAsync(cancellationToken, userId, currencyType));
         }
         catch (Exception e)
         {

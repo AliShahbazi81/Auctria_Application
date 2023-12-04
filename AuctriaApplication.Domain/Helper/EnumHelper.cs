@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace AuctriaApplication.Domain.Helper;
+﻿namespace AuctriaApplication.Domain.Helper;
 
 public static class EnumHelper
 {
@@ -31,13 +29,5 @@ public static class EnumHelper
         }
         
         throw new InvalidOperationException("The provided string does not match any Enum value.");
-    }
-    
-    // Functionality to get the description attribute from an enum value
-    public static string GetDescription(this Enum value)
-    {
-        var fieldInfo = value.GetType().GetField(value.ToString());
-        var attributes = (DescriptionAttribute[])fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false);
-        return attributes.Length > 0 ? attributes[0].Description : value.ToString();
     }
 }

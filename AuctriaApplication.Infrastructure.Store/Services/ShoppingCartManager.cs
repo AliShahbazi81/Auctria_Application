@@ -1,7 +1,10 @@
-﻿using AuctriaApplication.Infrastructure.Results;
+﻿using AuctriaApplication.Domain.Enums;
+using AuctriaApplication.Domain.Helper;
+using AuctriaApplication.Infrastructure.Results;
 using AuctriaApplication.Infrastructure.Services.Abstract;
 using AuctriaApplication.Infrastructure.Store.Guards;
 using AuctriaApplication.Infrastructure.Store.Services.Abstract;
+using AuctriaApplication.Services.ExchangeAPI.Services.Abstract;
 using AuctriaApplication.Services.Membership.Services.Users.Abstract;
 using AuctriaApplication.Services.Store.Dto.ViewModel;
 using AuctriaApplication.Services.Store.Services.Abstract;
@@ -14,23 +17,27 @@ public class ShoppingCartManager : IShoppingCartManager
     private readonly IProductService _productService;
     private readonly IUserService _userService;
     private readonly IUserAccessor _userAccessor;
+    private readonly IExchangeService _exchangeService;
 
     public ShoppingCartManager(
         IProductService productService,
         IUserService userService,
         IShoppingCartService shoppingCartService,
-        IUserAccessor userAccessor)
+        IUserAccessor userAccessor, 
+        IExchangeService exchangeService)
     {
         _productService = productService;
         _userService = userService;
         _shoppingCartService = shoppingCartService;
         _userAccessor = userAccessor;
+        _exchangeService = exchangeService;
     }
     
     public async Task<Result<ShoppingCartViewModel?>> GetUserCartAsync(
         Guid cartId,
         CancellationToken cancellationToken, 
-        Guid? userId = null)
+        Guid? userId = null,
+        CurrencyTypes currencyType = CurrencyTypes.CAD)
     {
         // Check if user is locked or has any restrictions
         if (await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))
@@ -45,35 +52,75 @@ public class ShoppingCartManager : IShoppingCartManager
 
         // Generate and return the CartViewModel
         var cartViewModel = _shoppingCartService.ToViewModel(cart);
+        
+        // If currency is not CAD, convert the price
+        if (currencyType == CurrencyTypes.CAD) 
+            return Result<ShoppingCartViewModel?>.Success(cartViewModel);
+        
+        var convertedPrice = await _exchangeService.GetConversionRateAsync(currencyType.ToString());
+        
+        cartViewModel.Total = Math.Round(cartViewModel.Total * convertedPrice, 2);
+        cartViewModel.Currency = currencyType.ToString();
+        
+        // Convert the price of each product in the cart
+        foreach (var availableCart in cartViewModel.Products)
+        {
+            // Display 2 decimal places
+            availableCart.Price = Math.Round(availableCart.Price * convertedPrice, 2);
+        }
 
         return Result<ShoppingCartViewModel?>.Success(cartViewModel);
     }
     
     public async Task<Result<IEnumerable<ShoppingCartViewModel>>> GetUserCartsAsync(
         CancellationToken cancellationToken, 
-        Guid? userId = null)
+        Guid? userId = null, 
+        CurrencyTypes currencyType = CurrencyTypes.CAD)
     {
         // Check if user is locked or has any restrictions
         if (await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))
             throw new Exception("User account is locked.");
-        
+    
         var targetUserId = userId ?? _userAccessor.GetUserId();
 
         // Get or create cart
         var carts = await _shoppingCartService.GetListAsync(targetUserId, cancellationToken);
+
+        if (currencyType == CurrencyTypes.CAD) 
+            return Result<IEnumerable<ShoppingCartViewModel>>.Success(carts);
         
-        return Result<IEnumerable<ShoppingCartViewModel>>.Success(carts);
+        var convertedPrice = await _exchangeService.GetConversionRateAsync(currencyType.ToString());
+
+        var shoppingCartViewModels = carts.ToList();
+        foreach (var cart in shoppingCartViewModels)
+        {
+            // Convert and round the total price of the cart
+            cart.Total = Math.Round(cart.Total * convertedPrice, 2);
+            cart.Currency = currencyType.ToString();
+
+            // Convert and round the price of each product in the cart
+            foreach (var product in cart.Products)
+            {
+                product.Price = Math.Round(product.Price * convertedPrice, 2);
+            }
+        }
+
+        return Result<IEnumerable<ShoppingCartViewModel>>.Success(shoppingCartViewModels);
     }
 
     public async Task<Result<ShoppingCartViewModel?>> AddProductToCartAsync(
         Guid productId,
         int quantity,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        CurrencyTypes currencyType = CurrencyTypes.CAD)
     {
         
         // Check if quantity is valid
         if(!GeneralGuards.IsNumberMoreThanZero(quantity))
             return Result<ShoppingCartViewModel?>.Failure("Sorry, but the quantity of the product should be zero or more.");
+        
+        // Check if currency type is valid
+        EnumHelper.ConvertEnumValueToMatchingString<CurrencyTypes>((int)currencyType);
         
         // Check if user is locked or has any restrictions
         if (await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))
@@ -112,6 +159,23 @@ public class ShoppingCartManager : IShoppingCartManager
 
         // Generate and return the updated CartViewModel
         var updatedCartViewModel = _shoppingCartService.ToViewModel(latestCart);
+
+        // Convert prices if currency is not CAD
+        if (currencyType == CurrencyTypes.CAD) 
+            return Result<ShoppingCartViewModel?>.Success(updatedCartViewModel);
+        
+        // Calculate the conversion rate
+        var conversionRate = await _exchangeService.GetConversionRateAsync(currencyType.ToString());
+
+        // Convert the total price of the cart
+        updatedCartViewModel.Total = Math.Round(updatedCartViewModel.Total * conversionRate, 2);
+        updatedCartViewModel.Currency = currencyType.ToString();
+
+        // Convert the price of each product in the cart
+        foreach (var productInCart in updatedCartViewModel.Products)
+        {
+            productInCart.Price = Math.Round(productInCart.Price * conversionRate, 2);
+        }
 
         return Result<ShoppingCartViewModel?>.Success(updatedCartViewModel);
     }

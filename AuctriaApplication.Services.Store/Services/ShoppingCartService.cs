@@ -136,6 +136,7 @@ public class ShoppingCartService : IShoppingCartService
         var newCart = new Cart
         {
             Total = 0,
+            Currency = CurrencyTypes.CAD,
             CreatedAt = DateTime.UtcNow,
             UserId = userId
         };
@@ -207,7 +208,8 @@ public class ShoppingCartService : IShoppingCartService
         return new ShoppingCartViewModel
         {
             Id = cart.Id,
-            Total = cart.Total.ToString("N2"),
+            Total = (double)cart.Total,
+            Currency = cart.Currency.ToString(),
             PaymentStatus = cart.Payment != null! ? cart.Payment.PaymentStatus.ToString() : PaymentStatus.Pending.ToString(),
             CreatedAt = Convert.ToDateTime(cart.CreatedAt.ToLocalTime()
                 .ToString("G")),
@@ -216,7 +218,7 @@ public class ShoppingCartService : IShoppingCartService
                 ProductId = pc.ProductId,
                 Name = pc.Product.Name,
                 ImageUrl = pc.Product.ImageUrl ?? string.Empty,
-                Price = pc.Product.Price,
+                Price = (double)pc.Product.Price,
                 Quantity = pc.Quantity
             }).ToList()
         };

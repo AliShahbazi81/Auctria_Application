@@ -8,6 +8,7 @@ namespace AuctriaApplication.DataAccess.Entities.Stores;
 public class Cart : EntityBase
 {
     public required decimal Total { get; set; }
+    public required CurrencyTypes Currency { get; set; }
     
     // Relationships
     public required Guid UserId { get; set; }

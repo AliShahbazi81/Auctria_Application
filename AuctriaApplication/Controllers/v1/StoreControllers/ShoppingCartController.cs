@@ -1,4 +1,5 @@
-﻿using AuctriaApplication.Infrastructure.Store.Services.Abstract;
+﻿using AuctriaApplication.Domain.Enums;
+using AuctriaApplication.Infrastructure.Store.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Auctria_Application.Controllers.v1.StoreControllers;
@@ -20,11 +21,14 @@ public class ShoppingCartController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetShoppingCart(Guid cartId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetShoppingCart(
+        Guid cartId, 
+        CancellationToken cancellationToken, 
+        CurrencyTypes currencyType = CurrencyTypes.CAD)
     {
         try
         {
-            return HandleResult(await _shoppingCartManager.GetUserCartAsync(cartId, cancellationToken));
+            return HandleResult(await _shoppingCartManager.GetUserCartAsync(cartId, cancellationToken, currencyType: currencyType));
         }
         catch (Exception e)
         {
@@ -37,11 +41,13 @@ public class ShoppingCartController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetShoppingCarts(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetShoppingCarts(
+        CancellationToken cancellationToken, 
+        CurrencyTypes currencyType = CurrencyTypes.CAD)
     {
         try
         {
-            return HandleResult(await _shoppingCartManager.GetUserCartsAsync(cancellationToken));
+            return HandleResult(await _shoppingCartManager.GetUserCartsAsync(cancellationToken, currencyType: currencyType));
         }
         catch (Exception e)
         {
@@ -54,11 +60,15 @@ public class ShoppingCartController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> AddOrUpdateItem(Guid productId, int quantity, CancellationToken cancellationToken)
+    public async Task<IActionResult> AddOrUpdateItem(
+        Guid productId, 
+        int quantity, 
+        CancellationToken cancellationToken,
+        CurrencyTypes currencyType = CurrencyTypes.CAD)
     {
         try
         {
-            return HandleResult(await _shoppingCartManager.AddProductToCartAsync(productId, quantity, cancellationToken));
+            return HandleResult(await _shoppingCartManager.AddProductToCartAsync(productId, quantity, cancellationToken, currencyType));
         }
         catch (Exception e)
         {

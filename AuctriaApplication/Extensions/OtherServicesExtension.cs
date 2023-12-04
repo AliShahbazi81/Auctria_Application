@@ -54,6 +54,7 @@ public static class OtherServicesExtension
         services.AddScoped<IProductService, ProductService>();
         
         // Exchange
+        services.AddHttpClient();
         services.Configure<ExchangeConfig>(config.GetSection("Exchange"));
         services.AddSingleton(x => x.GetRequiredService<IOptions<ExchangeConfig>>().Value);
         services.AddScoped<IExchangeService, ExchangeService>();

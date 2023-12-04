@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\AuctriaApplication.Infrastructure\AuctriaApplication.Infrastructure.csproj" />
+      <ProjectReference Include="..\AuctriaApplication.Services.ExchangeAPI\AuctriaApplication.Services.ExchangeAPI.csproj" />
       <ProjectReference Include="..\AuctriaApplication.Services.Membership\AuctriaApplication.Services.Membership.csproj" />
       <ProjectReference Include="..\AuctriaApplication.Services.Store\AuctriaApplication.Services.Store.csproj" />
     </ItemGroup>
