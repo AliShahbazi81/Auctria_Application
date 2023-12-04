@@ -8,6 +8,16 @@ namespace AuctriaApplication.Infrastructure.Store.Services.Abstract;
 /// </summary>
 public interface IShoppingCartManager
 {
+
+    Task<Result<ShoppingCartViewModel?>> GetUserCartAsync(
+        Guid cartId,
+        CancellationToken cancellationToken, 
+        Guid? userId = null);
+
+    Task<Result<IEnumerable<ShoppingCartViewModel>>> GetUserCartsAsync(
+        CancellationToken cancellationToken,
+        Guid? userId = null);
+    
     /// <summary>
     /// Asynchronously adds a product to a shopping cart.
     /// </summary>

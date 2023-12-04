@@ -37,4 +37,11 @@ public enum PermissionAction
     Members_Lockout,
     
     #endregion
+
+    #region SHOPPING CART
+    
+    [Description("See other user's shopping cart list")]
+    ShoppingCart_List,
+
+    #endregion
 }

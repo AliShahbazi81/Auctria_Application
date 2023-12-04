@@ -22,4 +22,6 @@ public interface IUserAccessor
     /// </summary>
     /// <returns>The username of the current user.</returns>
     string GetUserUsername();
+
+    string GetUserRole();
 }

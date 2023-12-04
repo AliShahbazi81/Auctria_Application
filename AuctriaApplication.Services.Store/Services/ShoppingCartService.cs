@@ -17,7 +17,7 @@ public class ShoppingCartService : IShoppingCartService
         _context = context;
     }
 
-    public async Task<Cart> GetAsync(
+    public async Task<Cart?> GetAsync(
         Guid userId,
         Guid cartId,
         CancellationToken cancellationToken)
@@ -33,9 +33,6 @@ public class ShoppingCartService : IShoppingCartService
                     x.Id == cartId &&
                     x.UserId == userId,
                 cancellationToken: cancellationToken);
-
-        if (cart is null)
-            throw new NotFoundException();
 
         return cart;
     }
@@ -58,6 +55,9 @@ public class ShoppingCartService : IShoppingCartService
         await using var dbContext = await _context.CreateDbContextAsync(cancellationToken);
 
         var carts = await dbContext.Carts
+            .Include(x => x.Payment)
+            .Include(x => x.ProductCarts)
+            .ThenInclude(x => x.Product)
             .AsNoTracking()
             .Where(x => x.UserId == userId)
             .ToListAsync(cancellationToken: cancellationToken);
@@ -107,13 +107,13 @@ public class ShoppingCartService : IShoppingCartService
     }
     
     public async Task<Cart?> GetCartForUserAsync(
-        Guid userId, 
+        Guid userId,
         CancellationToken cancellationToken)
     {
         await using var dbContext = await _context.CreateDbContextAsync(cancellationToken);
         return await dbContext.Carts
             .Include(x => x.Payment)
-            .FirstOrDefaultAsync(c => 
+            .FirstOrDefaultAsync(c =>
                 c.UserId == userId && 
                 c.Payment.PaymentStatus != PaymentStatus.Succeeded, 
                 cancellationToken);
@@ -212,7 +212,7 @@ public class ShoppingCartService : IShoppingCartService
         return new ShoppingCartViewModel
         {
             Id = cart.Id,
-            Total = cart.Total.ToString("N0"),
+            Total = cart.Total.ToString("N2"),
             PaymentStatus = cart.Payment != null! ? cart.Payment.PaymentStatus.ToString() : PaymentStatus.Pending.ToString(),
             CreatedAt = Convert.ToDateTime(cart.CreatedAt.ToLocalTime()
                 .ToString("G")),

@@ -1,5 +1,4 @@
 ﻿using AuctriaApplication.Infrastructure.Results;
-using AuctriaApplication.Infrastructure.Services;
 using AuctriaApplication.Infrastructure.Services.Abstract;
 using AuctriaApplication.Infrastructure.Store.Services.Abstract;
 using AuctriaApplication.Services.Membership.Services.Users.Abstract;
@@ -25,6 +24,44 @@ public class ShoppingCartManager : IShoppingCartManager
         _userService = userService;
         _shoppingCartService = shoppingCartService;
         _userAccessor = userAccessor;
+    }
+    
+    public async Task<Result<ShoppingCartViewModel?>> GetUserCartAsync(
+        Guid cartId,
+        CancellationToken cancellationToken, 
+        Guid? userId = null)
+    {
+        // Check if user is locked or has any restrictions
+        if (await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))
+            throw new Exception("User account is locked.");
+        
+        var targetUserId = userId ?? _userAccessor.GetUserId();
+
+        // Get cart
+        var cart = await _shoppingCartService.GetAsync(targetUserId, cartId, cancellationToken);
+        if (cart is null)
+            return Result<ShoppingCartViewModel?>.Failure("It seems we faced a problem retrieving the cart.");
+
+        // Generate and return the CartViewModel
+        var cartViewModel = _shoppingCartService.ToViewModel(cart);
+
+        return Result<ShoppingCartViewModel?>.Success(cartViewModel);
+    }
+    
+    public async Task<Result<IEnumerable<ShoppingCartViewModel>>> GetUserCartsAsync(
+        CancellationToken cancellationToken, 
+        Guid? userId = null)
+    {
+        // Check if user is locked or has any restrictions
+        if (await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))
+            throw new Exception("User account is locked.");
+        
+        var targetUserId = userId ?? _userAccessor.GetUserId();
+
+        // Get or create cart
+        var carts = await _shoppingCartService.GetListAsync(targetUserId, cancellationToken);
+        
+        return Result<IEnumerable<ShoppingCartViewModel>>.Success(carts);
     }
 
     public async Task<Result<ShoppingCartViewModel>> AddProductToCartAsync(
@@ -57,6 +94,9 @@ public class ShoppingCartManager : IShoppingCartManager
         
         // Get the updated cart
         var latestCart = await _shoppingCartService.GetAsync(_userAccessor.GetUserId(), cart.Id, cancellationToken);
+
+        if (latestCart is null)
+            return Result<ShoppingCartViewModel>.Failure("It seems we faced a problem retrieving the cart.");
 
         // Generate and return the updated CartViewModel
         var updatedCartViewModel = _shoppingCartService.ToViewModel(latestCart);

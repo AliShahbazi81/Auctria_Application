@@ -15,6 +15,40 @@ public class ShoppingCartController : BaseApiController
         _shoppingCartManager = shoppingCartManager;
         _logger = logger;
     }
+    
+    [HttpGet("GetShoppingCart")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetShoppingCart(Guid cartId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return HandleResult(await _shoppingCartManager.GetUserCartAsync(cartId, cancellationToken));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"Error while trying to retrieve the shopping cart. Error: {e.Message}");
+            throw;
+        }
+    }
+    
+    [HttpGet("GetShoppingCarts")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetShoppingCarts(CancellationToken cancellationToken)
+    {
+        try
+        {
+            return HandleResult(await _shoppingCartManager.GetUserCartsAsync(cancellationToken));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError($"Error while trying to retrieve the shopping carts. Error: {e.Message}");
+            throw;
+        }
+    }
 
     [HttpPost("AddOrUpdateItem")]
     [ProducesResponseType(StatusCodes.Status200OK)]

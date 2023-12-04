@@ -117,9 +117,7 @@ public class UserService : IUserService
 
         return await ToUserDto(user, dbContext);
     }
-
-
-
+    
     private async Task<UserViewModel> ToUserDto(User user, ApplicationDbContext dbContext)
     {
         return new UserViewModel
