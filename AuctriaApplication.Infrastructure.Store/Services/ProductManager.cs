@@ -5,6 +5,7 @@ using AuctriaApplication.Infrastructure.Store.Guards;
 using AuctriaApplication.Infrastructure.Store.Services.Abstract;
 using AuctriaApplication.Services.ExchangeAPI.Services.Abstract;
 using AuctriaApplication.Services.Membership.Services.Users.Abstract;
+using AuctriaApplication.Services.Redis.Services.Abstract;
 using AuctriaApplication.Services.Store.Dto;
 using AuctriaApplication.Services.Store.Dto.ViewModel;
 using AuctriaApplication.Services.Store.Services.Abstract;
@@ -18,19 +19,22 @@ public class ProductManager : IProductManager
     private readonly IUserAccessor _userAccessor;
     private readonly IUserService _userService;
     private readonly IExchangeService _exchangeService;
+    private readonly IRedisService _redisService;
 
     public ProductManager(
         IProductService productService, 
         IUserAccessor userAccessor, 
         IUserService userService, 
         ICategoryService categoryService, 
-        IExchangeService exchangeService)
+        IExchangeService exchangeService, 
+        IRedisService redisService)
     {
         _productService = productService;
         _userAccessor = userAccessor;
         _userService = userService;
         _categoryService = categoryService;
         _exchangeService = exchangeService;
+        _redisService = redisService;
     }
 
     public async Task<Result<IEnumerable<ProductViewModel>>> GetProductAsync(
@@ -47,25 +51,45 @@ public class ProductManager : IProductManager
         if (await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))
             return Result<IEnumerable<ProductViewModel>>.Failure("Sorry, but your account is locked.");
         
-        var product = await _productService.GetAsync(cancellationToken, productId, productName);
+        // Construct a Redis key based on the product ID or name
+        var redisKey = $"product_{productId}";
+
+        List<ProductViewModel> productViewModels;
+
+        // Try to get the product from Redis
+        var productFromRedis = await _redisService.GetAsync<List<ProductViewModel>>(redisKey);
+        if (productFromRedis != null)
+        {
+            productViewModels = productFromRedis;
+        }
+        else
+        {
+            var product = await _productService.GetAsync(cancellationToken, productId, productName);
         
-        // If currency is not CAD, convert the price
+            // Cache the product in Redis for future requests
+            var viewModels = product.ToList();
+            await _redisService.SetAsync(redisKey, viewModels, TimeSpan.FromDays(30)); 
+
+            productViewModels = viewModels.ToList();
+        }
+
+        // Currency conversion logic
         if (currencyType == CurrencyTypes.CAD) 
-            return Result<IEnumerable<ProductViewModel>>.Success(product);
+            return Result<IEnumerable<ProductViewModel>>.Success(productViewModels);
         
         // Get the conversion rate
         var convertedPrice = await _exchangeService.GetConversionRateAsync(currencyType.ToString());
         
         // Convert the price of each product to the selected currency
-        var productViewModels = product.ToList();
-        foreach (var productViewModel in productViewModels)
+        var viewModelsList = productViewModels.ToList();
+        foreach (var productViewModel in viewModelsList)
         {
             // Display 2 decimal places
             productViewModel.Price = Math.Round(productViewModel.Price * convertedPrice, 2);
             productViewModel.Currency = currencyType.ToString();
         }
-        
-        return Result<IEnumerable<ProductViewModel>>.Success(productViewModels);
+
+        return Result<IEnumerable<ProductViewModel>>.Success(viewModelsList);
     }
 
     public async Task<Result<IEnumerable<ProductViewModel>>> GetProductsListAsync(
@@ -132,6 +156,10 @@ public class ProductManager : IProductManager
         
         // Add the product
         var product = await _productService.AddAsync(_userAccessor.GetUserId(), categoryId, productDto, cancellationToken);
+        
+        // Cache the new product in Redis
+        var redisKey = $"product_{product.Id}";
+        await _redisService.SetAsync(redisKey, new List<ProductViewModel> { product }, TimeSpan.FromDays(30)); 
         
         return Result<ProductViewModel>.Success(product);
     }
