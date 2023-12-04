@@ -1,5 +1,5 @@
-﻿using AuctriaApplication.Services.Store.Dto;
-using AuctriaApplication.Services.Store.Dto.ViewModel;
+﻿using AuctriaApplication.Domain.Dto;
+using AuctriaApplication.Domain.Dto.ViewModel;
 
 namespace AuctriaApplication.Services.Store.Services.Abstract;
 

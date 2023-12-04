@@ -2,10 +2,10 @@
 using System.Net.Security;
 using AuctriaApplication.DataAccess.DbContext;
 using AuctriaApplication.DataAccess.Entities.Stores;
+using AuctriaApplication.Domain.Dto;
+using AuctriaApplication.Domain.Dto.ViewModel;
 using AuctriaApplication.Domain.Exceptions;
 using AuctriaApplication.Domain.Helper;
-using AuctriaApplication.Services.Store.Dto;
-using AuctriaApplication.Services.Store.Dto.ViewModel;
 using AuctriaApplication.Services.Store.Services.Abstract;
 using Microsoft.EntityFrameworkCore;
 

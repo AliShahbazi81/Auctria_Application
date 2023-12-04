@@ -1,6 +1,6 @@
-﻿using AuctriaApplication.Infrastructure.Results;
-using AuctriaApplication.Services.Store.Dto;
-using AuctriaApplication.Services.Store.Dto.ViewModel;
+﻿using AuctriaApplication.Domain.Dto;
+using AuctriaApplication.Domain.Dto.ViewModel;
+using AuctriaApplication.Infrastructure.Results;
 
 namespace AuctriaApplication.Infrastructure.Store.Services.Abstract;
 

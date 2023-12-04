@@ -1,6 +1,6 @@
-﻿using AuctriaApplication.Services.Store.Dto.Base;
+﻿using AuctriaApplication.Domain.Dto.Base;
 
-namespace AuctriaApplication.Services.Store.Dto.ViewModel;
+namespace AuctriaApplication.Domain.Dto.ViewModel;
 
 public record CategoryViewModel : BaseCategoryDto
 {

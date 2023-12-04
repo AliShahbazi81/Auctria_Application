@@ -1,4 +1,4 @@
-﻿namespace AuctriaApplication.Services.Store.Dto.Base;
+﻿namespace AuctriaApplication.Domain.Dto.Base;
 
 public record BaseProductDto
 {

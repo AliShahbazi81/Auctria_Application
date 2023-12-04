@@ -1,6 +1,8 @@
 ﻿using System.Text.Json;
 using AuctriaApplication.Services.Redis.Services.Abstract;
+using AuctriaApplication.Services.Redis.Services.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
 namespace AuctriaApplication.Services.Redis.Services;
@@ -11,11 +13,11 @@ public class RedisService : IRedisService
     private readonly IDatabase _database;
     private readonly ILogger<RedisService> _logger;
 
-    public RedisService(string connectionString, 
+    public RedisService(IOptions<RedisConfig> redisConfig, 
         ILogger<RedisService> logger)
     {
         _logger = logger;
-        _redis = ConnectionMultiplexer.Connect(connectionString);
+        _redis = ConnectionMultiplexer.Connect(redisConfig.Value.ConnectionString);
         _database = _redis.GetDatabase();
     }
 

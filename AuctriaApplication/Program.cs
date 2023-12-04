@@ -4,6 +4,8 @@ using Auctria_Application.Extensions;
 using AuctriaApplication.DataAccess.DbContext;
 using AuctriaApplication.DataAccess.Entities.Users;
 using AuctriaApplication.DataAccess.Seed;
+using AuctriaApplication.Services.Redis.Services;
+using AuctriaApplication.Services.Redis.Services.Abstract;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +17,7 @@ builder.Services.AddSwaggerService();
 builder.Services.AddAuthenticationService();
 builder.Services.AddIdentityService(builder.Configuration);
 builder.Services.AddOtherServices(builder.Configuration);
+builder.Services.AddSingleton<IRedisService, RedisService>();
 // -------------------------- End of Register Services --------------------------
 
 builder.Services.AddControllers();
@@ -29,11 +32,13 @@ using var scope = app.Services.CreateScope();
 var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+var redisService = app.Services.GetRequiredService<IRedisService>(); 
+
 
 try
 {
     context.Database.Migrate();
-    await DbInitializer.Initializer(context, userManager, roleManager);
+    await DbInitializer.Initializer(context, userManager, roleManager, redisService);
 }
 catch (Exception e)
 {

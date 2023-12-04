@@ -2,8 +2,10 @@
 using AuctriaApplication.DataAccess.DbContext;
 using AuctriaApplication.DataAccess.Entities.Stores;
 using AuctriaApplication.DataAccess.Entities.Users;
+using AuctriaApplication.Domain.Dto;
 using AuctriaApplication.Domain.Enums;
 using AuctriaApplication.Domain.Variables;
+using AuctriaApplication.Services.Redis.Services.Abstract;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,22 +14,23 @@ namespace AuctriaApplication.DataAccess.Seed;
 public static class DbInitializer
 {
     private static readonly string _superAdminEmail = "alishahbazi799@gmail.com";
+
     public static async Task Initializer(
         ApplicationDbContext context,
         UserManager<User> userManager,
-        RoleManager<Role> roleManager)
+        RoleManager<Role> roleManager,
+        IRedisService redisService)
     {
-        
         await SeedRoles(roleManager);
 
-        
+
         await SeedUsers(userManager, roleManager);
-        
-        
+
+
         await SeedCategories(context);
-        
-        
-        await SeedProducts(context);
+
+
+        await SeedProducts(context, redisService);
     }
 
     private static async Task SeedRoles(RoleManager<Role> roleManager)
@@ -119,7 +122,7 @@ public static class DbInitializer
 
         foreach (var user in users)
         {
-            var password = user.Email == "admin@test.com" ? "123456" : "1234567"; 
+            var password = user.Email == "admin@test.com" ? "123456" : "1234567";
             var result = await userManager.CreateAsync(user, password);
 
             if (!result.Succeeded) continue;
@@ -140,13 +143,13 @@ public static class DbInitializer
             await userManager.AddToRoleAsync(user, roleName);
 
             // Adding RoleClaims for Admin
-            if (user.Email != "admin@test.com") 
+            if (user.Email != "admin@test.com")
                 continue;
-            
+
             var adminRole = await roleManager.FindByNameAsync(SharedRolesVar.Admin);
-            if (adminRole == null) 
+            if (adminRole == null)
                 continue;
-            
+
             var permissions = GetPermissionsForRole(SharedRolesVar.Admin);
             foreach (var permission in permissions)
             {
@@ -211,12 +214,12 @@ public static class DbInitializer
                 UserId = (await dbContext.Users.SingleAsync(x => x.Email == _superAdminEmail)).Id
             }
         };
-        
+
         await dbContext.Categories.AddRangeAsync(categories);
         await dbContext.SaveChangesAsync();
     }
 
-    private static async Task SeedProducts(ApplicationDbContext dbContext)
+    private static async Task SeedProducts(ApplicationDbContext dbContext, IRedisService redisService)
     {
         if (await dbContext.Products.AnyAsync())
             return;
@@ -488,8 +491,30 @@ public static class DbInitializer
                 UserId = (await dbContext.Users.FirstOrDefaultAsync(x => x.Email == _superAdminEmail))?.Id ?? Guid.Empty
             }
         };
-        
+
         await dbContext.Products.AddRangeAsync(products);
         await dbContext.SaveChangesAsync();
+        
+        // Add products to Redis
+        foreach (var product in products)
+        {
+            var redisKey = $"product_{product.Id}";
+            var productViewModel = new ProductViewModel
+            {
+                // Map Product properties to ProductViewModel
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = (double)product.Price,
+                Quantity = product.Quantity,
+                ImageUrl = product.ImageUrl,
+                CategoryId = product.CategoryId,
+                CategoryName = product.Category.Name,
+                CreatedAt = product.CreatedAt,
+                IsDeleted = product.IsDeleted
+            };
+
+            await redisService.SetAsync(redisKey, new List<ProductViewModel> { productViewModel }, TimeSpan.FromDays(30));
+        }
     }
 }

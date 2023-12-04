@@ -10,4 +10,8 @@
       <ProjectReference Include="..\AuctriaApplication.DataAccess\AuctriaApplication.DataAccess.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Dto\" />
+    </ItemGroup>
+
 </Project>

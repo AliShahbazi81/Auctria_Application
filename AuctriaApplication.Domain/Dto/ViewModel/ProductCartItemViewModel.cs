@@ -1,4 +1,4 @@
-﻿namespace AuctriaApplication.Services.Store.Dto.ViewModel;
+﻿namespace AuctriaApplication.Domain.Dto.ViewModel;
 
 public record ProductCartItemViewModel
 {

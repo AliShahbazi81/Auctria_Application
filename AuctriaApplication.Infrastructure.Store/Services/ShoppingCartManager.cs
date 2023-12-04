@@ -1,4 +1,5 @@
-﻿using AuctriaApplication.Domain.Enums;
+﻿using AuctriaApplication.Domain.Dto.ViewModel;
+using AuctriaApplication.Domain.Enums;
 using AuctriaApplication.Domain.Helper;
 using AuctriaApplication.Infrastructure.Results;
 using AuctriaApplication.Infrastructure.Services.Abstract;
@@ -6,7 +7,6 @@ using AuctriaApplication.Infrastructure.Store.Guards;
 using AuctriaApplication.Infrastructure.Store.Services.Abstract;
 using AuctriaApplication.Services.ExchangeAPI.Services.Abstract;
 using AuctriaApplication.Services.Membership.Services.Users.Abstract;
-using AuctriaApplication.Services.Store.Dto.ViewModel;
 using AuctriaApplication.Services.Store.Services.Abstract;
 
 namespace AuctriaApplication.Infrastructure.Store.Services;

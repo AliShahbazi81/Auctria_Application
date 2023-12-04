@@ -1,6 +1,5 @@
 ﻿using AuctriaApplication.DataAccess.Entities.Stores;
-using AuctriaApplication.Services.Store.Dto;
-using AuctriaApplication.Services.Store.Dto.ViewModel;
+using AuctriaApplication.Domain.Dto;
 
 namespace AuctriaApplication.Services.Store.Services.Abstract;
 

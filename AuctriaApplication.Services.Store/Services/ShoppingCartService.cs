@@ -1,8 +1,8 @@
 ﻿using AuctriaApplication.DataAccess.DbContext;
 using AuctriaApplication.DataAccess.Entities.Stores;
+using AuctriaApplication.Domain.Dto.ViewModel;
 using AuctriaApplication.Domain.Enums;
 using AuctriaApplication.Domain.Exceptions;
-using AuctriaApplication.Services.Store.Dto.ViewModel;
 using AuctriaApplication.Services.Store.Services.Abstract;
 using Microsoft.EntityFrameworkCore;
 

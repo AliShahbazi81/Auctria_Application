@@ -1,10 +1,9 @@
 ﻿using System.Linq.Expressions;
 using AuctriaApplication.DataAccess.DbContext;
 using AuctriaApplication.DataAccess.Entities.Stores;
+using AuctriaApplication.Domain.Dto;
 using AuctriaApplication.Domain.Exceptions;
 using AuctriaApplication.Domain.Helper;
-using AuctriaApplication.Services.Store.Dto;
-using AuctriaApplication.Services.Store.Dto.ViewModel;
 using AuctriaApplication.Services.Store.Services.Abstract;
 using Microsoft.EntityFrameworkCore;
 
@@ -194,7 +193,9 @@ public class ProductService : IProductService
         {
             Id = product.Id,
             Name = product.Name,
+            CategoryId = product.CategoryId,
             CategoryName = product.Category.Name,
+            CreatedAt = product.CreatedAt.ToLocalTime(),
             Description = product.Description,
             Quantity = product.Quantity,
             ImageUrl = product.ImageUrl,
@@ -209,7 +210,9 @@ public class ProductService : IProductService
         {
             Id = product.Id,
             Name = product.Name,
+            CategoryId = product.CategoryId,
             CategoryName = categoryName,
+            CreatedAt = product.CreatedAt.ToLocalTime(),
             Description = product.Description,
             Quantity = product.Quantity,
             ImageUrl = product.ImageUrl,

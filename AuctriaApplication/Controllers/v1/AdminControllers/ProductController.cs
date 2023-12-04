@@ -1,7 +1,7 @@
 ﻿using Auctria_Application.Attribute;
+using AuctriaApplication.Domain.Dto;
 using AuctriaApplication.Domain.Enums;
 using AuctriaApplication.Infrastructure.Store.Services.Abstract;
-using AuctriaApplication.Services.Store.Dto;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Auctria_Application.Controllers.v1.AdminControllers;

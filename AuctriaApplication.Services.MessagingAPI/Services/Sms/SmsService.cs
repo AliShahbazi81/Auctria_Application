@@ -12,7 +12,7 @@ public class SmsService : ISmsService
     public SmsService(SmsConfiguration config)
     {
         _config = config;
-        TwilioClient.Init(_config.AccountSid, _config.AuthToken);
+        TwilioClient.Init(_config.AccountSid, _config.SecretKey);
     }
 
     public async Task<bool> SendAsync(

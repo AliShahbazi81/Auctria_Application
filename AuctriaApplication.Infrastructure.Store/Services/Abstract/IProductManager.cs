@@ -1,7 +1,6 @@
-﻿using AuctriaApplication.Domain.Enums;
+﻿using AuctriaApplication.Domain.Dto;
+using AuctriaApplication.Domain.Enums;
 using AuctriaApplication.Infrastructure.Results;
-using AuctriaApplication.Services.Store.Dto;
-using AuctriaApplication.Services.Store.Dto.ViewModel;
 
 namespace AuctriaApplication.Infrastructure.Store.Services.Abstract;
 

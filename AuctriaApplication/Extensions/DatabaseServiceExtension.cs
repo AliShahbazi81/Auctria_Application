@@ -1,6 +1,7 @@
 ﻿using AuctriaApplication.DataAccess.DbContext;
 using AuctriaApplication.Services.Redis.Services;
 using AuctriaApplication.Services.Redis.Services.Abstract;
+using AuctriaApplication.Services.Redis.Services.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 namespace Auctria_Application.Extensions;
@@ -23,9 +24,8 @@ public static class DatabaseServiceExtension
         }
         
         // Configure and register Redis
-        var redisConnectionString = config.GetSection("Redis:ConnectionString").Value;
-        services.AddSingleton<IRedisService>(sp => 
-            new RedisService(redisConnectionString!, sp.GetRequiredService<ILogger<RedisService>>()));
+        services.Configure<RedisConfig>(config.GetSection("Redis"));
+        services.AddSingleton<IRedisService, RedisService>();
         
         return services;
     }
