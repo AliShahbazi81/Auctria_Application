@@ -6,6 +6,9 @@ using AuctriaApplication.Infrastructure.Services;
 using AuctriaApplication.Infrastructure.Services.Abstract;
 using AuctriaApplication.Infrastructure.Store.Services;
 using AuctriaApplication.Infrastructure.Store.Services.Abstract;
+using AuctriaApplication.Services.ExchangeAPI.Services;
+using AuctriaApplication.Services.ExchangeAPI.Services.Abstract;
+using AuctriaApplication.Services.ExchangeAPI.Services.Configuration;
 using AuctriaApplication.Services.Membership.Services.Token;
 using AuctriaApplication.Services.Membership.Services.Users;
 using AuctriaApplication.Services.Membership.Services.Users.Abstract;
@@ -49,6 +52,11 @@ public static class OtherServicesExtension
         services.AddScoped<IShoppingCartService, ShoppingCartService>();
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IProductService, ProductService>();
+        
+        // Exchange
+        services.Configure<ExchangeConfig>(config.GetSection("Exchange"));
+        services.AddSingleton(x => x.GetRequiredService<IOptions<ExchangeConfig>>().Value);
+        services.AddScoped<IExchangeService, ExchangeService>();
 
 
         // ----------------------- Managers -----------------------

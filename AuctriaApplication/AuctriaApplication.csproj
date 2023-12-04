@@ -30,6 +30,7 @@
       <ProjectReference Include="..\AuctriaApplication.Infrastructure.Membership\AuctriaApplication.Infrastructure.Membership.csproj" />
       <ProjectReference Include="..\AuctriaApplication.Infrastructure.Payment\AuctriaApplication.Infrastructure.Payment.csproj" />
       <ProjectReference Include="..\AuctriaApplication.Infrastructure.Store\AuctriaApplication.Infrastructure.Store.csproj" />
+      <ProjectReference Include="..\AuctriaApplication.Services.ExchangeAPI\AuctriaApplication.Services.ExchangeAPI.csproj" />
       <ProjectReference Include="..\AuctriaApplication.Services.Membership\AuctriaApplication.Services.Membership.csproj" />
       <ProjectReference Include="..\AuctriaApplication.Services.MessagingAPI\AuctriaApplication.Services.MessagingAPI.csproj" />
       <ProjectReference Include="..\AuctriaApplication.Services.Validation\AuctriaApplication.Services.Validation.csproj" />

@@ -58,7 +58,7 @@ public class PaymentService : IPaymentService
             var chargeOptions = new ChargeCreateOptions
             {
                 Amount = Convert.ToInt64(cost * 100),
-                Currency = Currency.Usd.ToString(),
+                Currency = CurrencyTypes.CAD.ToString(),
                 Description = "For testing stuffs",
                 Source = stripeToken.Id
             };
@@ -74,7 +74,7 @@ public class PaymentService : IPaymentService
             {
                 StripeChargeId = charge.Id,
                 Amount = charge.Amount,
-                Currency = Currency.Usd,
+                CurrencyTypes = CurrencyTypes.CAD,
                 PaymentStatus = EnumHelper.ConvertToEnum<PaymentStatus>(StringHelper.ConvertFirstLetterToUpper(charge.Status)),
                 CustomerStripeId = charge.CustomerId,
                 PaymentMethodDetails = charge.PaymentMethodDetails.ToString(),

@@ -8,7 +8,7 @@ public class Payment : EntityBase
 {
     public required string StripeChargeId { get; set; }
     public decimal Amount { get; set; }
-    public Currency Currency { get; set; }
+    public CurrencyTypes CurrencyTypes { get; set; }
     public required PaymentStatus PaymentStatus { get; set; }
     public required string CustomerStripeId { get; set; }
     public string? PaymentMethodDetails { get; set; }
