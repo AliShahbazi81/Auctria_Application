@@ -198,7 +198,7 @@ public class ProductService : IProductService
             Description = product.Description,
             Quantity = product.Quantity,
             ImageUrl = product.ImageUrl,
-            Price = product.Price.ToString("N0"),
+            Price = (double)product.Price,
             IsDeleted = product.IsDeleted
         };
     }
@@ -213,7 +213,7 @@ public class ProductService : IProductService
             Description = product.Description,
             Quantity = product.Quantity,
             ImageUrl = product.ImageUrl,
-            Price = product.Price.ToString("N0"),
+            Price = (double)product.Price,
             IsDeleted = product.IsDeleted
         };
     }

@@ -1,4 +1,5 @@
-﻿using AuctriaApplication.Infrastructure.Results;
+﻿using AuctriaApplication.Domain.Enums;
+using AuctriaApplication.Infrastructure.Results;
 using AuctriaApplication.Services.Store.Dto;
 using AuctriaApplication.Services.Store.Dto.ViewModel;
 
@@ -19,13 +20,15 @@ public interface IProductManager
     Task<Result<IEnumerable<ProductViewModel>>> GetProductAsync(
         Guid? productId, 
         string? productName, 
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken,
+        CurrencyTypes currencyType = CurrencyTypes.CAD);
 
     /// <summary>
     /// Asynchronously retrieves a list of products, optionally filtered by various criteria.
     /// </summary>
     /// <param name="cancellationToken">A token to cancel the asynchronous operation.</param>
     /// <param name="filterDto">The data transfer object containing filter criteria for products.</param>
+    /// <param name="currencyType"></param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a list of product view models.</returns>
     Task<Result<IEnumerable<ProductViewModel>>> GetProductsListAsync(
         CancellationToken cancellationToken,
@@ -35,7 +38,8 @@ public interface IProductManager
         double? maxPrice = null,
         int pageNumber = 1,
         int pageSize = 20,
-        bool isDeleted = false);
+        bool isDeleted = false,
+        CurrencyTypes currencyType = CurrencyTypes.CAD);
     
     /// <summary>
     /// Asynchronously adds a new product.

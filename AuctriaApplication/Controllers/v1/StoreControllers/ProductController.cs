@@ -1,4 +1,5 @@
-﻿using AuctriaApplication.Infrastructure.Store.Services.Abstract;
+﻿using AuctriaApplication.Domain.Enums;
+using AuctriaApplication.Infrastructure.Store.Services.Abstract;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Auctria_Application.Controllers.v1.StoreControllers;
@@ -20,11 +21,15 @@ public class ProductController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<IActionResult> GetProduct(Guid? productId, string? productName, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetProduct(
+        Guid? productId, 
+        string? productName, 
+        CancellationToken cancellationToken, 
+        CurrencyTypes currencyType = CurrencyTypes.CAD)
     {
         try
         {
-            return HandleResult(await _productManager.GetProductAsync(productId, productName, cancellationToken));
+            return HandleResult(await _productManager.GetProductAsync(productId, productName, cancellationToken, currencyType));
         }
         catch (Exception e)
         {
@@ -45,7 +50,8 @@ public class ProductController : BaseApiController
         [FromQuery] double? maxPrice = null,
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 20,
-        [FromQuery] bool isDeleted = false)
+        [FromQuery] bool isDeleted = false,
+        [FromQuery] CurrencyTypes currencyType = CurrencyTypes.CAD)
     {
         try
         {
@@ -57,7 +63,8 @@ public class ProductController : BaseApiController
                 maxPrice,
                 pageNumber,
                 pageSize,
-                isDeleted));
+                isDeleted,
+                currencyType));
         }
         catch (Exception e)
         {

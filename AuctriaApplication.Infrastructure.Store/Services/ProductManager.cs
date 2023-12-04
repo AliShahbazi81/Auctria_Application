@@ -1,7 +1,9 @@
-﻿using AuctriaApplication.Infrastructure.Results;
+﻿using AuctriaApplication.Domain.Enums;
+using AuctriaApplication.Infrastructure.Results;
 using AuctriaApplication.Infrastructure.Services.Abstract;
 using AuctriaApplication.Infrastructure.Store.Guards;
 using AuctriaApplication.Infrastructure.Store.Services.Abstract;
+using AuctriaApplication.Services.ExchangeAPI.Services.Abstract;
 using AuctriaApplication.Services.Membership.Services.Users.Abstract;
 using AuctriaApplication.Services.Store.Dto;
 using AuctriaApplication.Services.Store.Dto.ViewModel;
@@ -15,23 +17,27 @@ public class ProductManager : IProductManager
     private readonly ICategoryService _categoryService;
     private readonly IUserAccessor _userAccessor;
     private readonly IUserService _userService;
+    private readonly IExchangeService _exchangeService;
 
     public ProductManager(
         IProductService productService, 
         IUserAccessor userAccessor, 
         IUserService userService, 
-        ICategoryService categoryService)
+        ICategoryService categoryService, 
+        IExchangeService exchangeService)
     {
         _productService = productService;
         _userAccessor = userAccessor;
         _userService = userService;
         _categoryService = categoryService;
+        _exchangeService = exchangeService;
     }
 
     public async Task<Result<IEnumerable<ProductViewModel>>> GetProductAsync(
         Guid? productId, 
         string? productName, 
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        CurrencyTypes currencyType = CurrencyTypes.CAD)
     {
         // Check if both of the inputs are null
         if (!GeneralGuards.AreInputsNull(productId, productName))
@@ -43,7 +49,23 @@ public class ProductManager : IProductManager
         
         var product = await _productService.GetAsync(cancellationToken, productId, productName);
         
-        return Result<IEnumerable<ProductViewModel>>.Success(product);
+        // If currency is not CAD, convert the price
+        if (currencyType == CurrencyTypes.CAD) 
+            return Result<IEnumerable<ProductViewModel>>.Success(product);
+        
+        // Get the conversion rate
+        var convertedPrice = await _exchangeService.GetConversionRateAsync(currencyType.ToString());
+        
+        // Convert the price of each product to the selected currency
+        var productViewModels = product.ToList();
+        foreach (var productViewModel in productViewModels)
+        {
+            // Display 2 decimal places
+            productViewModel.Price = Math.Round(productViewModel.Price * convertedPrice, 2);
+            productViewModel.Currency = currencyType.ToString();
+        }
+        
+        return Result<IEnumerable<ProductViewModel>>.Success(productViewModels);
     }
 
     public async Task<Result<IEnumerable<ProductViewModel>>> GetProductsListAsync(
@@ -54,7 +76,8 @@ public class ProductManager : IProductManager
         double? maxPrice = null,
         int pageNumber = 1,
         int pageSize = 20,
-        bool isDeleted = false)
+        bool isDeleted = false,
+        CurrencyTypes currencyType = CurrencyTypes.CAD)
     {
         // Check if user is locked
         if (await _userService.IsUserLockedAsync(_userAccessor.GetUserId()))
@@ -71,7 +94,23 @@ public class ProductManager : IProductManager
             pageSize, 
             isDeleted);
         
-        return Result<IEnumerable<ProductViewModel>>.Success(products);
+        // If currency is not CAD, convert the price
+        if (currencyType == CurrencyTypes.CAD) 
+            return Result<IEnumerable<ProductViewModel>>.Success(products);
+        
+        // Get the conversion rate
+        var convertedPrice = await _exchangeService.GetConversionRateAsync(currencyType.ToString());
+        
+        // Convert the price of each product to the selected currency
+        var productViewModels = products.ToList();
+        foreach (var product in productViewModels)
+        {
+            // Display 2 decimal places
+            product.Price = Math.Round(product.Price * convertedPrice, 2);
+            product.Currency = currencyType.ToString();
+        }
+        
+        return Result<IEnumerable<ProductViewModel>>.Success(productViewModels);
     }
 
     public async Task<Result<ProductViewModel>> CreateProductAsync(

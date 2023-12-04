@@ -6,6 +6,7 @@ public record  ProductViewModel : BaseProductDto
 {
     public required Guid Id { get; set; }
     public required string CategoryName { get; set; }
-    public required string Price { get; set; }
+    public required double Price { get; set; }
+    public string? Currency { get; set; } = null;
     public bool IsDeleted { get; set; }
 }
