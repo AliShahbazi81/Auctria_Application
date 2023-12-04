@@ -72,25 +72,34 @@ public class ShoppingCartService : IShoppingCartService
         CancellationToken cancellationToken)
     {
         await using var dbContext = await _context.CreateDbContextAsync(cancellationToken);
-        
+    
         var productCart = await dbContext.ProductCarts
             .FirstOrDefaultAsync(pc => 
-                pc.CartId == cartId && 
-                pc.ProductId == productId, 
+                    pc.CartId == cartId && 
+                    pc.ProductId == productId, 
                 cancellationToken);
 
         if (productCart == null)
         {
-            dbContext.ProductCarts.Add(new ProductCart
+            if (quantity > 0) 
             {
-                CartId = cartId, 
-                ProductId = productId, 
-                Quantity = quantity
-            });
+                dbContext.ProductCarts.Add(new ProductCart
+                {
+                    CartId = cartId, 
+                    ProductId = productId, 
+                    Quantity = quantity
+                });
+            }
         }
         else
         {
-            productCart.Quantity = quantity; 
+            if (quantity > 0)
+                productCart.Quantity = quantity;
+            else
+            {
+                // Remove the product from the cart if quantity is 0
+                dbContext.ProductCarts.Remove(productCart);
+            }
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
