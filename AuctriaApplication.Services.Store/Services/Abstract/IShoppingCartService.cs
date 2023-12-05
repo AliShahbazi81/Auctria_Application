@@ -111,6 +111,11 @@ public interface IShoppingCartService
     /// <returns>The ShoppingCartViewModel.</returns>
     ShoppingCartViewModel ToViewModel(Cart cart);
 
+    /// <summary>
+    /// Asynchronously checks if a shopping cart is paid
+    /// </summary>
+    /// <param name="cartId">The unique identifier of the shopping cart.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result indicates whether the shopping cart is paid</returns>
     Task<bool?> IsCartPaidAsync(Guid cartId);
 
 }
